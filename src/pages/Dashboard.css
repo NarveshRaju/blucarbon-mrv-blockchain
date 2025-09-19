@@ -1,0 +1,149 @@
+/* General Dashboard Layout */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.dashboard-header {
+  position: relative;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: #202124;
+}
+
+.dashboard-header p {
+  margin: 5px 0 0;
+  color: #5f6368;
+}
+
+.profile-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid #dadce0;
+  background-color: #fff;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background-color: #e8f0fe; /* Light blue background */
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #d2e3fc;
+}
+
+.stat-title {
+  margin: 0;
+  font-size: 1rem;
+  color: #3c4043;
+}
+
+.stat-value {
+  margin: 10px 0;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #1a73e8; /* Blue */
+}
+
+.stat-label {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #5f6368;
+}
+
+/* Project Filters */
+.project-filters {
+  background-color: #e8f5e9; /* Light green */
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  gap: 20px;
+}
+
+.search-bar, .status-dropdown {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+/* Projects Grid */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.project-card {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.project-name {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #202124;
+}
+
+.project-type {
+  margin: 0;
+  color: #5f6368;
+}
+
+.project-details p {
+  margin: 5px 0;
+  color: #3c4043;
+}
+
+.details-button {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #dadce0;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  margin-top: auto;
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  color: #202124;
+}
+
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.status-badge.approved { background-color: #34a853; } /* Green */
+.status-badge.pending { background-color: #fbbc05; } /* Yellow */
+.status-badge.rejected { background-color: #ea4335; } /* Red */

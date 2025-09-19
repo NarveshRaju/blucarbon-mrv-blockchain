@@ -1,0 +1,42 @@
+.sidebar {
+  width: 250px;
+  background-color: #ffffff;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e0e0e0;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.logo-container {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #0d47a1; /* A deep blue */
+  margin-bottom: 40px;
+  padding: 10px 0;
+}
+
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-item {
+  padding: 15px 20px;
+  margin-bottom: 10px;
+  text-decoration: none;
+  color: #5f6368; /* Google's grey text color */
+  border-radius: 8px;
+  font-weight: 500;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-item:hover {
+  background-color: #f1f3f4; /* Light grey for hover */
+}
+
+.nav-item.active {
+  background-color: #ff9800; /* Orange for active link */
+  color: #ffffff;
+}

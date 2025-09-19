@@ -1,0 +1,46 @@
+.profile-container { display: flex; flex-direction: column; gap: 30px; }
+
+.profile-main-card, .profile-sub-card {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 25px;
+}
+
+.profile-info { display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px; }
+.avatar { width: 50px; height: 50px; border-radius: 50%; background-color: #e8eaf6; color: #3f51b5; display: grid; place-items: center; font-weight: bold; }
+.profile-info h2 { margin: 0; }
+.validator-tag { background-color: #1e88e5; color: #fff; padding: 4px 10px; border-radius: 16px; font-size: 0.8rem; }
+
+.wallet-info, .activity-summary { padding: 20px 0; border-bottom: 1px solid #e0e0e0; }
+h3 { margin: 0 0 15px 0; }
+.wallet-address-container, .token-balance-container { display: flex; justify-content: space-between; align-items: center; }
+.wallet-label, .balance-label { color: #5f6368; margin: 0 0 5px 0; }
+.wallet-address, .balance-value { font-weight: 500; font-family: 'monospace'; }
+.connection-status.connected { color: #388e3c; font-weight: bold; }
+.balance-value { font-size: 2rem; color: #f57c00; }
+.voting-power { font-size: 1.5rem; font-weight: bold; color: #388e3c; }
+
+.summary-boxes { display: flex; justify-content: space-around; text-align: center; }
+.summary-value { display: block; font-size: 1.8rem; font-weight: bold; }
+.summary-label { color: #5f6368; }
+
+.profile-actions { display: flex; gap: 10px; margin-top: 20px; }
+.disconnect-btn, .edit-profile-btn { flex: 1; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+.disconnect-btn { background-color: #0d47a1; color: #fff; border: none; }
+.edit-profile-btn { background-color: #f1f3f4; border: 1px solid #dadce0; }
+
+.history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f3f4; }
+.history-item:last-child { border-bottom: none; }
+.history-info { display: flex; align-items: center; gap: 15px; }
+.status-icon { font-size: 1.2rem; color: #388e3c; }
+.status-icon.rejected { color: #d32f2f; }
+.history-name { font-weight: 500; margin: 0; }
+.history-id { font-size: 0.8rem; color: #5f6368; margin: 0; }
+.history-details { display: flex; align-items: center; gap: 15px; }
+.history-status-tag { padding: 4px 10px; border-radius: 12px; color: #fff; font-size: 0.8rem; font-weight: bold; }
+.history-status-tag.approved { background-color: #34a853; }
+.history-status-tag.rejected { background-color: #ea4335; }
+.history-date { color: #5f6368; }
+
+.token-description { font-size: 0.9rem; color: #5f6368; line-height: 1.5; margin-top: 15px; }
