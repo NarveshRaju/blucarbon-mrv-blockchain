@@ -1,17 +1,9 @@
-import React from 'react';
-import { Link } from 'react-router-dom'; // Import Link for navigation
+// Dashboard.js
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 import './Dashboard.css';
 
-// Data can be fetched from an API in a real application
-// Added 'id' to each project for unique routing
-const projects = [
-  { id: 1, name: 'Mangrove Restoration Initiative', type: 'Ocean Conservation Alliance', status: 'Approved', location: 'Sundarbans, Bangladesh', trees: 2500, submitted: '1/15/2024' },
-  { id: 2, name: 'Seagrass Meadow Protection', type: 'Marine Biodiversity Foundation', status: 'Pending', location: 'Great Barrier Reef, Australia', trees: 1800, submitted: '1/20/2024' },
-  { id: 3, name: 'Salt Marsh Rehabilitation', type: 'Coastal Restoration Society', status: 'Rejected', location: 'San Francisco Bay, USA', trees: 3200, submitted: '1/25/2024' },
-  { id: 4, name: 'Coastal Mangrove Expansion', type: 'Blue Planet Initiative', status: 'Pending', location: 'Coastal Area, Kenya', trees: 4000, submitted: '2/01/2024' },
-  { id: 5, name: 'Seagrass Recovery Program', type: 'Mediterranean Sea Foundation', status: 'Approved', location: 'Balearic Islands, Spain', trees: 2900, submitted: '2/05/2024' },
-];
-    
 const StatCard = ({ title, value, label }) => (
   <div className="stat-card">
     <p className="stat-title">{title}</p>
@@ -23,23 +15,48 @@ const StatCard = ({ title, value, label }) => (
 const ProjectCard = ({ project }) => (
   <div className="project-card">
     <div className="project-header">
-      <h3 className="project-name">{project.name}</h3>
-      <span className={`status-badge ${project.status.toLowerCase()}`}>{project.status}</span>
+      <h3 className="project-name">{project.ngoName}</h3>
+      <span className={`status-badge ${project.status?.toLowerCase() || "pending"}`}>
+        {project.status || "Pending"}
+      </span>
     </div>
-    <p className="project-type">{project.type}</p>
+    <p className="project-type">{project.plantationType}</p>
     <div className="project-details">
       <p>📍 {project.location}</p>
-      <p>🌳 {project.trees.toLocaleString()} trees</p>
-      <p>🗓️ Submitted {project.submitted}</p>
+      <p>🌳 {project.saplingsPlanted?.toLocaleString()} trees</p>
+      <p>🗓️ Submitted {new Date(project.createdAt).toLocaleDateString()}</p>
     </div>
-    {/* Replaced the button with a Link component */}
-    <Link to={`/project/${project.id}`} className="details-button">
-        View Details
+    <Link to={`/project/${project._id}`} className="details-button">
+      View Details
     </Link>
   </div>
 );
 
 const Dashboard = () => {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const API = process.env.REACT_APP_API_URL || "https://blockchain-blue-carbon-mrv.onrender.com";
+    axios.get(`${API}/forms`)
+      .then(res => {
+        setProjects(res.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching forms:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return <p>Loading projects...</p>;
+
+  // Calculate stats dynamically
+  const total = projects.length;
+  const approved = projects.filter(p => p.status === "Approved").length;
+  const pending = projects.filter(p => p.status === "Pending").length;
+  const rejected = projects.filter(p => p.status === "Rejected").length;
+
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
@@ -49,10 +66,10 @@ const Dashboard = () => {
       </header>
 
       <section className="stats-grid">
-        <StatCard title="Total Projects" value="5" label="Active submissions" />
-        <StatCard title="Pending Approvals" value="2" label="Awaiting verification" />
-        <StatCard title="Approved" value="2" label="Verified projects" />
-        <StatCard title="Rejected" value="1" label="Failed verification" />
+        <StatCard title="Total Projects" value={total} label="Active submissions" />
+        <StatCard title="Pending Approvals" value={pending} label="Awaiting verification" />
+        <StatCard title="Approved" value={approved} label="Verified projects" />
+        <StatCard title="Rejected" value={rejected} label="Failed verification" />
       </section>
 
       <section className="project-filters">
@@ -66,8 +83,8 @@ const Dashboard = () => {
       </section>
 
       <section className="projects-grid">
-        {projects.map((project) => (
-          <ProjectCard key={project.id} project={project} />
+        {projects.map(project => (
+          <ProjectCard key={project._id} project={project} />
         ))}
       </section>
     </div>
