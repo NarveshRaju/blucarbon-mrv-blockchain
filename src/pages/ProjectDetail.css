@@ -1,5 +1,7 @@
 .project-detail-container {
     padding: 20px;
+    max-width: 900px;
+    margin: auto;
 }
 
 .back-link {
@@ -10,15 +12,22 @@
     font-weight: 500;
 }
 
+.back-link:hover {
+    text-decoration: underline;
+}
+
 .detail-header {
     display: flex;
     align-items: center;
     gap: 20px;
     margin-bottom: 5px;
+    flex-wrap: wrap;
 }
 
 .detail-header h1 {
     margin: 0;
+    font-size: 2.2rem;
+    color: #202124;
 }
 
 .detail-status-badge {
@@ -27,6 +36,7 @@
     font-weight: bold;
     color: #fff;
     font-size: 0.9rem;
+    white-space: nowrap;
 }
 .detail-status-badge.approved { background-color: #34a853; }
 .detail-status-badge.pending { background-color: #fbbc05; }
@@ -61,11 +71,117 @@
     margin: 0;
     font-size: 1.1rem;
     font-weight: 500;
+    color: #202124;
 }
 
-.detail-description {
+.detail-description, .detail-image {
     background-color: #fff;
     border: 1px solid #e0e0e0;
-    padding: 20px;
+    padding: 25px;
     border-radius: 12px;
+    margin-bottom: 30px;
 }
+
+.detail-image img {
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+
+/* --- Voting Section Styles --- */
+.voting-section {
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  padding: 25px;
+  border-radius: 12px;
+  margin-top: 30px;
+}
+
+.voting-section h3 {
+  margin-top: 0;
+  color: #202124;
+}
+
+.vote-counts {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0 15px;
+}
+
+.vote-counts p {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.vote-counts strong {
+  font-size: 1.5rem;
+  color: #1a73e8;
+}
+
+.vote-progress {
+  width: 100%;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  height: 20px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #4285f4; /* Google Blue */
+  transition: width 0.4s ease-in-out;
+  border-radius: 8px;
+}
+
+.vote-summary {
+  text-align: center;
+  margin-top: 10px;
+  color: #5f6368;
+}
+
+.vote-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.approve-btn, .disapprove-btn {
+  flex: 1;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  color: white;
+}
+
+.approve-btn:hover:not(:disabled), .disapprove-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.approve-btn {
+  background-color: #34a853; /* Green */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.disapprove-btn {
+  background-color: #ea4335; /* Red */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.approve-btn:disabled, .disapprove-btn:disabled {
+  background-color: #bdc1c6;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.vote-message {
+  text-align: center;
+  margin-top: 15px;
+  font-weight: 500;
+  color: #1e8e3e;
+}
+
