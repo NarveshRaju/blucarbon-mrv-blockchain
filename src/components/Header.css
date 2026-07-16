@@ -1,0 +1,69 @@
+/* --- Main Header Container --- */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* --- Header Title --- */
+.header-title h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0b2d4f; /* Dark navy blue */
+}
+
+/* --- Container for Admin Badge and Button --- */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* --- Admin Badge Styling --- */
+.admin-badge {
+  background-color: #e8f0fe; /* Light blue */
+  color: #1967d2; /* Darker blue */
+  padding: 6px 12px;
+  border-radius: 9999px; /* Pill shape */
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* --- Connect Button Styling --- */
+.connect-button {
+  /* Reset and base styles */
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+
+  /* Visual styling */
+  background-color: #1a73e8; /* Primary blue */
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  
+  /* Smooth transition effects */
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.connect-button:hover {
+  background-color: #185abc; /* Darker blue on hover */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.connect-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

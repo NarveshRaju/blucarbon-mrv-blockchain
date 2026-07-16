@@ -16,7 +16,41 @@
   margin-bottom: 40px;
   padding: 10px 0;
 }
+/* --- Stylish Logo Container --- */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
 
+/* --- Logo Icon Styling --- */
+.logo-icon {
+  color: #1a73e8; /* A vibrant blue */
+  flex-shrink: 0; /* Prevents the icon from shrinking */
+}
+
+/* --- Text Container --- */
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+/* --- Main "Blue Carbon MRV" Text --- */
+.logo-main-text {
+  font-size: 1.1rem; /* 18px */
+  font-weight: 700;
+  color: #202124; /* Dark, readable text */
+}
+
+/* --- "BY CODESANCTUM" Byline --- */
+.logo-byline {
+  font-size: 0.65rem; /* 10px */
+  font-weight: 500;
+  color: #5f6368; /* Softer, secondary text color */
+  letter-spacing: 0.05em; /* Adds a professional touch */
+}
 .nav-menu {
   display: flex;
   flex-direction: column;

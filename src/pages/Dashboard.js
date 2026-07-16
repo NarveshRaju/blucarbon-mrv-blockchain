@@ -1,5 +1,4 @@
-// Dashboard.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './Dashboard.css';
@@ -15,18 +14,21 @@ const StatCard = ({ title, value, label }) => (
 const ProjectCard = ({ project }) => (
   <div className="project-card">
     <div className="project-header">
-      <h3 className="project-name">{project.ngoName}</h3>
+      {/* The main heading is now the project's name */}
+      <h3 className="project-name">{project.projectName}</h3>
       <span className={`status-badge ${project.status?.toLowerCase() || "pending"}`}>
         {project.status || "Pending"}
       </span>
     </div>
+    {/* Added a new line to display the NGO name */}
+ 
     <p className="project-type">{project.plantationType}</p>
     <div className="project-details">
       <p>📍 {project.location}</p>
       <p>🌳 {project.saplingsPlanted?.toLocaleString()} trees</p>
       <p>🗓️ Submitted {new Date(project.createdAt).toLocaleDateString()}</p>
     </div>
-    <Link to={`/project/${project._id}`} className="details-button">
+    <Link to={`/project/${project.projectId}`} className="details-button">
       View Details
     </Link>
   </div>
@@ -36,22 +38,49 @@ const Dashboard = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+
   useEffect(() => {
     const API = process.env.REACT_APP_API_URL || "https://blockchain-blue-carbon-mrv.onrender.com";
-    axios.get(`${API}/forms`)
+    axios.get(`${API}/projects-for-sale`)
       .then(res => {
         setProjects(res.data);
         setLoading(false);
       })
       .catch(err => {
-        console.error("Error fetching forms:", err);
+        console.error("Error fetching projects:", err);
         setLoading(false);
       });
   }, []);
 
-  if (loading) return <p>Loading projects...</p>;
+  const filteredProjects = useMemo(() => {
+    return projects
+      // Use projectId for the filter key, as it's what the API provides
+      .filter(p => p && p.projectId)
+      .filter(project => {
+        if (statusFilter === 'all') return true;
+        return project.status?.toLowerCase() === statusFilter;
+      })
+      .filter(project => {
+        const term = searchTerm.toLowerCase();
 
-  // Calculate stats dynamically
+        // If search term is empty, show all projects
+        if (!term) {
+          return true;
+        }
+
+        // Only search if there is a term
+        return (
+          project.projectName?.toLowerCase().includes(term) ||
+          project.ngoName?.toLowerCase().includes(term) ||
+          project.location?.toLowerCase().includes(term)
+        );
+      });
+  }, [projects, searchTerm, statusFilter]);
+
+  if (loading) return <div className="dashboard-container"><p>Loading projects...</p></div>;
+
   const total = projects.length;
   const approved = projects.filter(p => p.status === "Approved").length;
   const pending = projects.filter(p => p.status === "Pending").length;
@@ -73,8 +102,16 @@ const Dashboard = () => {
       </section>
 
       <section className="project-filters">
-        <input type="search" placeholder="Search projects, NGOs, or locations..." className="search-bar" />
-        <select className="status-dropdown">
+        <input
+          type="search"
+          placeholder="Search projects, NGOs, or locations..."
+          className="search-bar"
+          onChange={e => setSearchTerm(e.target.value)}
+        />
+        <select
+          className="status-dropdown"
+          onChange={e => setStatusFilter(e.target.value)}
+        >
           <option value="all">All Status</option>
           <option value="approved">Approved</option>
           <option value="pending">Pending</option>
@@ -83,12 +120,17 @@ const Dashboard = () => {
       </section>
 
       <section className="projects-grid">
-        {projects.map(project => (
-          <ProjectCard key={project._id} project={project} />
-        ))}
+        {filteredProjects.length > 0 ? (
+          filteredProjects.map(project => (
+            <ProjectCard key={project.projectId} project={project} />
+          ))
+        ) : (
+          <p>No projects match your current filters.</p>
+        )}
       </section>
     </div>
   );
 };
 
 export default Dashboard;
+

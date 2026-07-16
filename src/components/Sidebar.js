@@ -9,9 +9,28 @@ const Sidebar = () => {
   return (
     <div className="sidebar">
       <div className="logo-container">
-        {/* You can use an SVG or an img tag for your logo */}
-        🌊 Blue Carbon DAO
-      </div>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="28"
+    height="28"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="logo-icon"
+  >
+    <path d="M7 20h10" />
+    <path d="M10 20v-2a2 2 0 1 1 4 0v2" />
+    <path d="M12 18a4 4 0 0 1 4-4h2a2 2 0 1 1 0 4h-2a4 4 0 0 1-4-4z" />
+    <path d="M12 14a4 4 0 0 0-4-4H6a2 2 0 1 0 0 4h2a4 4 0 0 0 4-4z" />
+  </svg>
+  <div className="logo-text">
+    <span className="logo-main-text">Blue Carbon MRV</span>
+    <span className="logo-byline">BY CODESANCTUM</span>
+  </div>
+</div>
       <nav className="nav-menu">
         <NavLink to="/" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}>
           Dashboard
@@ -25,9 +44,7 @@ const Sidebar = () => {
         <NavLink to="/profile" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}>
           Profile
         </NavLink>
-        <NavLink to="/settings" className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}>
-          Settings
-        </NavLink>
+
       </nav>
     </div>
   );
