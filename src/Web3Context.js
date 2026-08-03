@@ -1,10 +1,9 @@
 import React, { createContext, useState, useContext, useCallback, useEffect } from 'react';
 import { BrowserProvider, Contract } from 'ethers';
+import contractData from './contracts/BlueCarbonToken.json';
 
-
-// --- Your Contract Details ---
-const contractAddress = "0xcd91f2fFd3faE5ffeFFDc11Cd182684aEa09Af71";
-const contractABI = [{"inputs":[{"internalType":"address","name":"initialOwner","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"string","name":"offChainProjectId","type":"string"},{"indexed":true,"internalType":"address","name":"recipient","type":"address"},{"indexed":false,"internalType":"uint256","name":"amountMinted","type":"uint256"}],"name":"ApprovalRecord","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue","type":"uint256"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue","type":"uint256"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"string","name":"offChainProjectId","type":"string"}],"name":"mintAndRecordApproval","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"}];
+const { contractAddress } = contractData;
+const contractABI = contractData.abi;
 
 const Web3Context = createContext();
 
@@ -15,6 +14,7 @@ export const Web3Provider = ({ children }) => {
   const [userAddress, setUserAddress] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [bctBalance, setBctBalance] = useState("0");
+  const [totalSupply, setTotalSupply] = useState("0");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -27,6 +27,18 @@ export const Web3Provider = ({ children }) => {
     } catch (err) {
       console.error("Failed to fetch BCT balance:", err);
       setBctBalance("0");
+    }
+  }, []);
+
+  /** Fetch total supply */
+  const fetchTotalSupply = useCallback(async (tokenContract) => {
+    if (!tokenContract) return;
+    try {
+      const supply = await tokenContract.totalSupply();
+      setTotalSupply(supply.toString());
+    } catch (err) {
+      console.error("Failed to fetch total supply:", err);
+      setTotalSupply("0");
     }
   }, []);
 
@@ -58,8 +70,9 @@ export const Web3Provider = ({ children }) => {
       setUserAddress(_userAddress);
       setIsAdmin(_isAdmin);
 
-      // Fetch BCT balance immediately
+      // Fetch BCT balance and total supply
       await fetchBctBalance(_userAddress, _contract);
+      await fetchTotalSupply(_contract);
 
       console.log("✅ Connected wallet:", _userAddress);
     } catch (err) {
@@ -73,7 +86,7 @@ export const Web3Provider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [fetchBctBalance]);
+  }, [fetchBctBalance, fetchTotalSupply]);
 
   /** Hard Disconnect Wallet */
   const disconnectWallet = useCallback(async () => {
@@ -83,6 +96,7 @@ export const Web3Provider = ({ children }) => {
     setUserAddress(null);
     setIsAdmin(false);
     setBctBalance("0");
+    setTotalSupply("0");
     setError(null);
     setLoading(false);
 
@@ -136,6 +150,7 @@ export const Web3Provider = ({ children }) => {
         userAddress,
         isAdmin,
         bctBalance,
+        totalSupply,
         error,
         loading,
         connectWallet,

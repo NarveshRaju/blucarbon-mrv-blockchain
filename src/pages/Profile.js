@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useWeb3 } from '../Web3Context';
+import { useRole } from '../RoleContext';
 import { formatUnits } from 'ethers';
-import axios from 'axios';
+import apiClient from '../services/api';
 import './Profile.css';
-
-const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "https://blockchain-blue-carbon-mrv.onrender.com",
-});
 
 const Profile = () => {
   const { userAddress, isAdmin, bctBalance, connectWallet, disconnectWallet } = useWeb3();
+  const { role, setShowRoleSelector, ROLE_LABELS, ROLE_ICONS } = useRole();
   const [formattedBalance, setFormattedBalance] = useState('0');
   const [votingHistory, setVotingHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
@@ -41,6 +39,10 @@ const Profile = () => {
       .finally(() => setLoadingHistory(false));
   }, [userAddress]);
 
+  const votingPower = bctBalance && bctBalance !== '0'
+    ? parseFloat(formatUnits(bctBalance, 18))
+    : 0;
+
   if (!userAddress) {
     return (
       <div className="profile-container">
@@ -58,6 +60,7 @@ const Profile = () => {
   }
 
   const shortAddress = `${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`;
+  const delegation = localStorage.getItem(`bcd_delegate_${userAddress.toLowerCase()}`);
 
   return (
     <div className="profile-container">
@@ -67,7 +70,30 @@ const Profile = () => {
           <div className="avatar">{userAddress.substring(2, 4).toUpperCase()}</div>
           <div>
             <h2>{shortAddress}</h2>
-            {isAdmin && <span className="validator-tag">Admin</span>}
+            <div className="profile-badges">
+              {isAdmin && <span className="validator-tag">Admin</span>}
+              {role && (
+                <span className="role-tag">
+                  {ROLE_ICONS[role]} {ROLE_LABELS[role]}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Role Management */}
+        <div className="wallet-info">
+          <h3>Role</h3>
+          <div className="role-management">
+            <p className="wallet-label">
+              Current Role: <strong>{role ? ROLE_LABELS[role] : 'Not set'}</strong>
+            </p>
+            <button
+              className="change-role-btn"
+              onClick={() => setShowRoleSelector(true)}
+            >
+              Change Role
+            </button>
           </div>
         </div>
 
@@ -83,18 +109,33 @@ const Profile = () => {
         </div>
 
         <div className="wallet-info">
-          <h3>Token Balance</h3>
+          <h3>Token Balance & Voting Power</h3>
           <div className="token-balance-container">
             <div>
               <p className="balance-label">Blue Carbon Token (BCT)</p>
               <p className="balance-value">{formattedBalance}</p>
             </div>
+            <div style={{ textAlign: 'right' }}>
+              <p className="balance-label">Voting Power</p>
+              <p className="voting-power">{votingPower.toLocaleString()}</p>
+            </div>
           </div>
           <p className="token-description">
             BCT tokens represent verified carbon credits from approved blue carbon projects.
-            Each token corresponds to one unit of carbon sequestration.
+            Each token corresponds to one unit of carbon sequestration and one unit of voting power.
           </p>
         </div>
+
+        {/* Delegation Status */}
+        {delegation && (
+          <div className="wallet-info">
+            <h3>🤝 Vote Delegation</h3>
+            <div className="delegation-info">
+              <p className="wallet-label">Delegated To</p>
+              <p className="wallet-address">{delegation}</p>
+            </div>
+          </div>
+        )}
 
         <div className="profile-actions">
           <button className="disconnect-btn" onClick={disconnectWallet}>

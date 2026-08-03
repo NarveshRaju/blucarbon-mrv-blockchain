@@ -1,15 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
 import { useWeb3 } from '../Web3Context';
+import { useRole } from '../RoleContext';
+import apiClient from '../services/api';
+import WorkflowStepper from '../components/WorkflowStepper';
 import { formatUnits, parseUnits } from 'ethers';
 import './ProjectDetail.css';
 
-const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "https://blockchain-blue-carbon-mrv.onrender.com",
-});
-
-// This helper component uses the context-provided contract
 const AdminWalletInfo = () => {
   const { contract, userAddress } = useWeb3();
   const [balance, setBalance] = useState('0');
@@ -37,9 +34,9 @@ const AdminWalletInfo = () => {
 
 const ProjectDetail = () => {
   const { projectId } = useParams();
-  const { contract, isAdmin } = useWeb3();
+  const { contract, isAdmin, userAddress } = useWeb3();
+  const { role, ROLES } = useRole();
 
-  // Local state for this component
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -48,7 +45,12 @@ const ProjectDetail = () => {
   const [txMessage, setTxMessage] = useState('');
   const [notification, setNotification] = useState('');
 
-  // Fetch off-chain project data from your API
+  const isValidator = role === ROLES.VALIDATOR || role === ROLES.ADMIN;
+  const isNGO = role === ROLES.NGO;
+  const isInvestor = role === ROLES.INVESTOR;
+  const isProjectOwner = project && userAddress &&
+    project.walletAddress?.toLowerCase() === userAddress.toLowerCase();
+
   const fetchProjectData = useCallback(() => {
     apiClient.get(`/forms/${projectId}`)
       .then(res => setProject(res.data))
@@ -71,10 +73,7 @@ const ProjectDetail = () => {
       };
 
       contract.on("ApprovalRecord", onApproval);
-
-      return () => {
-        contract.off("ApprovalRecord", onApproval);
-      };
+      return () => { contract.off("ApprovalRecord", onApproval); };
     }
   }, [contract, project, fetchProjectData]);
 
@@ -83,10 +82,14 @@ const ProjectDetail = () => {
     setIsVoting(true);
     setError(null);
     try {
-      const response = await apiClient.patch(`/forms/${projectId}/status`, { action: voteType });
-      setProject(response.data);
+      const newStatus = voteType === 'approve' ? 'Approved' : 'Rejected';
+      const response = await apiClient.patch(`/forms/${projectId}/status`, { status: newStatus });
+      setProject(response.data.form || response.data);
+      setNotification(voteType === 'approve'
+        ? '✅ Project approved! Tokens can now be minted.'
+        : '❌ Project rejected.');
     } catch (err) {
-      setError(err.response?.data?.message || "An error occurred while voting.");
+      setError(err.response?.data?.error || "An error occurred while voting.");
     } finally {
       setIsVoting(false);
     }
@@ -111,6 +114,8 @@ const ProjectDetail = () => {
       await tx.wait();
 
       setTxMessage('');
+      setNotification('✅ Tokens minted successfully!');
+      fetchProjectData();
     } catch (err) {
       console.error("Smart contract minting failed:", err);
       setTxMessage(`❌ Error: ${err.message || "Transaction failed."}`);
@@ -120,26 +125,31 @@ const ProjectDetail = () => {
   };
 
   if (loading) return <div className="project-detail-container"><p>Loading Project...</p></div>;
-  if (error && !project) return <div className="project-detail-container"><h2>Error</h2><p>{error}</p><Link to="/">← Back to Dashboard</Link></div>;
-  if (!project) return <div className="project-detail-container"><h2>Project Not Found</h2><Link to="/">← Back to Dashboard</Link></div>;
+  if (error && !project) return <div className="project-detail-container"><h2>Error</h2><p>{error}</p><Link to="/">← Back</Link></div>;
+  if (!project) return <div className="project-detail-container"><h2>Project Not Found</h2><Link to="/">← Back</Link></div>;
 
-  const { approveVotes = 0, disapproveVotes = 0, status = 'pending' } = project;
-  const totalVotes = approveVotes + disapproveVotes;
-  const isApproved = status.toLowerCase() === 'approved';
-  const votingConcluded = status.toLowerCase() !== 'pending';
+  const status = (project.status || 'Pending').toLowerCase();
+  const isApproved = status === 'approved';
+  const isPending = status === 'pending';
 
   return (
     <div className="project-detail-container">
       {notification && <div className="realtime-notification">{notification}</div>}
-      <Link to="/" className="back-link">← Back to Dashboard</Link>
+
+      <Link to={isValidator ? "/verification" : isNGO ? "/ngo/projects" : "/"} className="back-link">
+        ← Back to {isValidator ? "Review Queue" : isNGO ? "My Projects" : "Dashboard"}
+      </Link>
+
+      {/* Workflow Stepper */}
+      <WorkflowStepper project={project} />
 
       <div className="detail-header">
         <h1>{project.projectName}</h1>
-        <span className={`detail-status-badge ${project.status?.toLowerCase() || "pending"}`}>
+        <span className={`detail-status-badge ${status}`}>
           {project.status || "Pending"}
         </span>
       </div>
-      <p className="detail-organization">Submitted by: {project.ngoName}</p>
+      <p className="detail-organization">Submitted by: {project.ngoId || project.ngoName}</p>
 
       <div className="detail-grid">
         <div className="detail-card"><h4>Location</h4><p>📍 {project.location}</p></div>
@@ -150,71 +160,93 @@ const ProjectDetail = () => {
 
       <div className="detail-description">
         <h3>Project Overview</h3>
-        <p>{project.description}</p>
+        <p>{project.description || 'No description provided.'}</p>
       </div>
 
+      {/* Images */}
       <div className="detail-image">
         <h3>Uploaded Images</h3>
         {(project.imageBase64s && Array.isArray(project.imageBase64s) && project.imageBase64s.length > 0) ? (
           <div className="image-gallery">
             {project.imageBase64s.map((src, index) => (
-              <img
-                key={index}
-                src={src}
-                alt={`Project visual ${index + 1}`}
-              />
+              <img key={index} src={src} alt={`Project visual ${index + 1}`} />
             ))}
           </div>
         ) : (
-          <div className="image-placeholder">
-            <span>No Images Available</span>
-          </div>
+          <div className="image-placeholder"><span>No Images Available</span></div>
         )}
       </div>
 
-      <div className="voting-section">
-        <h3>Project Voting</h3>
-        <div className="vote-counts">
-          <p>Approve: <strong>{approveVotes}</strong></p>
-          <p>Disapprove: <strong>{disapproveVotes}</strong></p>
+      {/* ===== ROLE-SPECIFIC ACTIONS ===== */}
+
+      {/* Validator: Vote Section */}
+      {(isValidator || !role) && (
+        <div className="voting-section">
+          <h3>🔍 Project Verification</h3>
+          {isPending ? (
+            <>
+              <p className="vote-prompt">As a validator, review the project data above and cast your vote:</p>
+              <div className="vote-actions">
+                <button onClick={() => handleVote('approve')} className="approve-btn" disabled={isVoting}>
+                  {isVoting ? 'Processing...' : '✅ Approve Project'}
+                </button>
+                <button onClick={() => handleVote('disapprove')} className="disapprove-btn" disabled={isVoting}>
+                  {isVoting ? 'Processing...' : '❌ Reject Project'}
+                </button>
+              </div>
+            </>
+          ) : (
+            <p className="vote-message">
+              Verification for this project has concluded — Status: <strong>{project.status}</strong>
+            </p>
+          )}
+          {error && <p className="vote-error">{error}</p>}
         </div>
-        <div className="vote-progress">
-          <div className="progress-bar" style={{ width: `${Math.min(totalVotes * 10, 100)}%` }}></div>
-        </div>
-        <p className="vote-summary">{totalVotes} votes cast</p>
+      )}
 
-        {!votingConcluded ? (
-          <div className="vote-actions">
-            <button onClick={() => handleVote('approve')} className="approve-btn" disabled={isVoting}>
-              {isVoting ? 'Voting...' : 'Approve'}
-            </button>
-            <button onClick={() => handleVote('disapprove')} className="disapprove-btn" disabled={isVoting}>
-              {isVoting ? 'Voting...' : 'Disapprove'}
-            </button>
-          </div>
-        ) : (
-          <p className="vote-message">Voting for this project has concluded.</p>
-        )}
-      </div>
-
-      <hr />
-
+      {/* Admin: Mint Section */}
       {isAdmin && (
         <div className="admin-section">
-          <h3>Admin Actions</h3>
+          <h3>🛡️ Admin Actions</h3>
           <AdminWalletInfo />
 
           {isApproved ? (
             <div>
-              <p>This project has been approved by the DAO.</p>
+              <p>This project has been approved. Mint BCT tokens to the NGO's wallet:</p>
+              <p className="mint-info">
+                Recipient: <code>{project.walletAddress}</code><br />
+                Amount: <strong>{project.saplingsPlanted?.toLocaleString()} BCT</strong>
+              </p>
               <button className="mint-btn" onClick={handleMintTokens} disabled={isMinting}>
-                {isMinting ? 'Minting...' : 'Mint & Send Tokens to NGO'}
+                {isMinting ? 'Minting...' : '🪙 Mint & Send Tokens to NGO'}
               </button>
             </div>
           ) : (
-            <p>This project is not yet approved.</p>
+            <p>Project must be approved before tokens can be minted.</p>
           )}
           {txMessage && <p className="vote-message blockchain">{txMessage}</p>}
+        </div>
+      )}
+
+      {/* NGO Owner: List for Sale */}
+      {isNGO && isProjectOwner && isApproved && (
+        <div className="ngo-action-section">
+          <h3>🏷️ List Tokens for Sale</h3>
+          <p>Your project has been approved! You can now list your BCT tokens on the marketplace.</p>
+          <Link to="/ngo/projects" className="list-tokens-link">
+            Go to My Projects to List →
+          </Link>
+        </div>
+      )}
+
+      {/* Investor: Buy Link */}
+      {isInvestor && project.price && project.price > 0 && (
+        <div className="investor-action-section">
+          <h3>💱 Available on Marketplace</h3>
+          <p>This project's tokens are listed at <strong>{project.price} ETH/token</strong>.</p>
+          <Link to="/marketplace" className="marketplace-link">
+            Buy on Marketplace →
+          </Link>
         </div>
       )}
     </div>

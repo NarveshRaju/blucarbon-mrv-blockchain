@@ -1,40 +1,40 @@
 import React from 'react';
 import { useWeb3 } from '../Web3Context';
+import { useRole } from '../RoleContext';
 import './Header.css';
 
 const Header = () => {
-  // Get the state and functions from our global context
   const { userAddress, isAdmin, connectWallet, disconnectWallet } = useWeb3();
+  const { role, ROLE_LABELS, ROLE_ICONS, setShowRoleSelector } = useRole();
 
-  // Determine the button text based on whether a user is connected
   const buttonText = userAddress
     ? `Disconnect: ${userAddress.substring(0, 6)}...${userAddress.substring(userAddress.length - 4)}`
     : "Connect Wallet";
 
-  // A single, clear handler for the button click
   const handleClick = () => {
     if (userAddress) {
-      // If a user is connected, this button's only job is to disconnect.
       disconnectWallet();
     } else {
-      // If no user is connected, this button's only job is to connect.
       connectWallet();
     }
   };
 
   return (
     <header className="app-header">
-      <div className="header-title">
-        <button
-          className="connect-button"
-          onClick={handleClick}
-        >
-          {buttonText}
-        </button>
+      <div className="header-left">
+        {userAddress && role && (
+          <button className="header-role-pill" onClick={() => setShowRoleSelector(true)} title="Click to switch role">
+            <span className="role-pill-icon">{ROLE_ICONS[role]}</span>
+            <span className="role-pill-label">{ROLE_LABELS[role]}</span>
+            <span className="role-pill-switch">⇄ Switch</span>
+          </button>
+        )}
       </div>
       <div className="header-actions">
-        {isAdmin && <span className="admin-badge">Admin View</span>}
-      
+        {isAdmin && <span className="admin-badge">Admin</span>}
+        <button className="connect-button" onClick={handleClick}>
+          {buttonText}
+        </button>
       </div>
     </header>
   );

@@ -1,5 +1,5 @@
 .sidebar {
-  width: 250px;
+  width: 260px;
   background-color: #ffffff;
   height: 100vh;
   display: flex;
@@ -7,70 +7,97 @@
   border-right: 1px solid #e0e0e0;
   padding: 20px;
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
-.logo-container {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #0d47a1; /* A deep blue */
-  margin-bottom: 40px;
-  padding: 10px 0;
-}
-/* --- Stylish Logo Container --- */
+/* --- Logo Container --- */
 .logo-container {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 16px;
+  margin-bottom: 8px;
 }
 
-/* --- Logo Icon Styling --- */
 .logo-icon {
-  color: #1a73e8; /* A vibrant blue */
-  flex-shrink: 0; /* Prevents the icon from shrinking */
+  color: #1a73e8;
+  flex-shrink: 0;
 }
 
-/* --- Text Container --- */
 .logo-text {
   display: flex;
   flex-direction: column;
   line-height: 1.2;
 }
 
-/* --- Main "Blue Carbon MRV" Text --- */
 .logo-main-text {
-  font-size: 1.1rem; /* 18px */
+  font-size: 1.1rem;
   font-weight: 700;
-  color: #202124; /* Dark, readable text */
+  color: #202124;
 }
 
-/* --- "BY CODESANCTUM" Byline --- */
 .logo-byline {
-  font-size: 0.65rem; /* 10px */
+  font-size: 0.65rem;
   font-weight: 500;
-  color: #5f6368; /* Softer, secondary text color */
-  letter-spacing: 0.05em; /* Adds a professional touch */
+  color: #5f6368;
+  letter-spacing: 0.05em;
 }
+
+/* --- Role Badge --- */
+.role-badge-container {
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+
+.sidebar-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #e8f0fe;
+  color: #1967d2;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* --- Navigation --- */
 .nav-menu {
   display: flex;
   flex-direction: column;
 }
 
+.nav-section-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #9aa0a6;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 16px 20px 6px;
+  margin-top: 4px;
+}
+
 .nav-item {
-  padding: 15px 20px;
-  margin-bottom: 10px;
+  padding: 12px 20px;
+  margin-bottom: 2px;
   text-decoration: none;
-  color: #5f6368; /* Google's grey text color */
+  color: #5f6368;
   border-radius: 8px;
   font-weight: 500;
-  transition: background-color 0.3s, color 0.3s;
+  font-size: 0.9rem;
+  transition: background-color 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .nav-item:hover {
-  background-color: #f1f3f4; /* Light grey for hover */
+  background-color: #f1f3f4;
+  color: #202124;
 }
 
 .nav-item.active {
-  background-color: #ff9800; /* Orange for active link */
-  color: #ffffff;
+  background-color: #e8f0fe;
+  color: #1a73e8;
+  font-weight: 600;
 }

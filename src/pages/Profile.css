@@ -10,7 +10,9 @@
 .profile-info { display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e0e0e0; padding-bottom: 20px; }
 .avatar { width: 50px; height: 50px; border-radius: 50%; background-color: #e8eaf6; color: #3f51b5; display: grid; place-items: center; font-weight: bold; }
 .profile-info h2 { margin: 0; }
+.profile-badges { display: flex; gap: 8px; margin-top: 6px; }
 .validator-tag { background-color: #1e88e5; color: #fff; padding: 4px 10px; border-radius: 16px; font-size: 0.8rem; }
+.role-tag { background-color: #e8f0fe; color: #1967d2; padding: 4px 10px; border-radius: 16px; font-size: 0.8rem; font-weight: 600; }
 
 .wallet-info, .activity-summary { padding: 20px 0; border-bottom: 1px solid #e0e0e0; }
 h3 { margin: 0 0 15px 0; }
@@ -19,7 +21,17 @@ h3 { margin: 0 0 15px 0; }
 .wallet-address, .balance-value { font-weight: 500; font-family: 'monospace'; }
 .connection-status.connected { color: #388e3c; font-weight: bold; }
 .balance-value { font-size: 2rem; color: #f57c00; }
-.voting-power { font-size: 1.5rem; font-weight: bold; color: #388e3c; }
+.voting-power { font-size: 1.5rem; font-weight: bold; color: #1a73e8; }
+
+.role-management { display: flex; justify-content: space-between; align-items: center; }
+.change-role-btn {
+  background: #e8f0fe; color: #1967d2; border: 1px solid #d2e3fc;
+  padding: 8px 16px; border-radius: 8px; font-weight: 600;
+  cursor: pointer; font-size: 0.85rem; transition: all 0.2s;
+}
+.change-role-btn:hover { background: #d2e3fc; }
+
+.delegation-info { background: #f8f9fa; padding: 12px; border-radius: 8px; }
 
 .summary-boxes { display: flex; justify-content: space-around; text-align: center; }
 .summary-value { display: block; font-size: 1.8rem; font-weight: bold; }
