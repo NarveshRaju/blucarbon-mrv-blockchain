@@ -1,0 +1,202 @@
+/* ============================================================
+   ProjectCard Styles
+   ============================================================ */
+
+.project-card {
+  background: var(--color-bg-card, #fff);
+  border: 1px solid var(--color-border-light, #f0f0f0);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow var(--transition-normal, 250ms ease);
+}
+
+.project-card:hover {
+  box-shadow: var(--shadow-md, 0 2px 8px rgba(0,0,0,0.08));
+}
+
+/* Image area */
+.project-card__image {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  background: var(--color-bg-page, #f8f9fa);
+  overflow: hidden;
+}
+
+.project-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.project-card__image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted, #9aa0a6);
+  background: linear-gradient(135deg, #e8f5e9 0%, #e0f2f1 100%);
+}
+
+.project-card__status-overlay {
+  position: absolute;
+  top: var(--spacing-sm, 8px);
+  right: var(--spacing-sm, 8px);
+}
+
+/* Content */
+.project-card__content {
+  padding: var(--spacing-md, 16px);
+  flex: 1;
+}
+
+.project-card__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: var(--spacing-sm, 8px);
+  flex-wrap: wrap;
+}
+
+.project-card__name {
+  margin: 0;
+  font-size: var(--font-size-base, 1rem);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--color-text-primary, #202124);
+  line-height: var(--line-height-tight, 1.25);
+}
+
+.project-card__evidence-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full, 9999px);
+  display: inline-flex;
+  align-items: center;
+}
+
+.project-card__evidence-badge.has-evidence {
+  background-color: var(--color-success-light, #e6f4ea);
+  color: var(--color-success-dark, #137333);
+  border: 1px solid rgba(52, 168, 83, 0.2);
+}
+
+.project-card__evidence-badge.no-evidence {
+  background-color: var(--color-warning-light, #fef7e0);
+  color: var(--color-warning-dark, #b06000);
+  border: 1px solid rgba(251, 188, 5, 0.3);
+}
+
+.project-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm, 8px);
+}
+
+.project-card__meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs, 0.75rem);
+  color: var(--color-text-secondary, #5f6368);
+}
+
+/* Extended data (area, carbon, biomass) */
+.project-card__extended {
+  display: flex;
+  gap: var(--spacing-md, 16px);
+  margin-top: var(--spacing-md, 16px);
+  padding-top: var(--spacing-sm, 8px);
+  border-top: 1px solid var(--color-border-light, #f0f0f0);
+}
+
+.project-card__extended-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.project-card__extended-label {
+  font-size: var(--font-size-xs, 0.75rem);
+  color: var(--color-text-muted, #9aa0a6);
+}
+
+.project-card__extended-value {
+  font-size: var(--font-size-md, 0.875rem);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--color-text-primary, #202124);
+}
+
+.project-card__pid {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--color-primary, #1a73e8);
+  background-color: #f1f3f4;
+  padding: 1px 5px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 2px;
+}
+
+.project-card__badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.project-card__mrv-pill {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+}
+.project-card__mrv-pill.draft { background-color: #f1f3f4; color: #5f6368; }
+.project-card__mrv-pill.submitted { background-color: #e8f0fe; color: #1a73e8; border: 1px solid rgba(26, 115, 232, 0.2); }
+.project-card__mrv-pill.under_review { background-color: #e0f2fe; color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.2); }
+.project-card__mrv-pill.approved,
+.project-card__mrv-pill.verified { background-color: #e6f4ea; color: #137333; border: 1px solid rgba(52, 168, 83, 0.2); }
+
+/* Footer */
+.project-card__footer {
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+  border-top: 1px solid var(--color-border-light, #f0f0f0);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.project-card__compare-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  color: var(--color-text-secondary, #5f6368);
+  cursor: pointer;
+  user-select: none;
+}
+
+.project-card__compare-toggle input {
+  cursor: pointer;
+}
+
+.project-card__view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-sm, 0.8125rem);
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-primary, #1a73e8);
+  text-decoration: none;
+  padding: 6px 0;
+}
+
+.project-card__view-btn:hover {
+  color: var(--color-primary-hover, #1557b0);
+}

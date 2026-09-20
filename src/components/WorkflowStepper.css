@@ -1,0 +1,164 @@
+/* ===== Full Stepper ===== */
+.workflow-stepper {
+  background: #f8f9fa;
+  border: 1px solid #e8eaed;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+
+.stepper-rejected-banner {
+  background: #fce8e6;
+  color: #c5221f;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.stepper-track {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.stepper-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.step-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  border: 3px solid #dadce0;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+
+.step-label {
+  font-size: 0.75rem;
+  color: #9aa0a6;
+  font-weight: 500;
+  text-align: center;
+  max-width: 80px;
+}
+
+/* Completed */
+.stepper-step.completed .step-circle {
+  background: #34a853;
+  border-color: #34a853;
+  color: #fff;
+  font-weight: 700;
+}
+.stepper-step.completed .step-label {
+  color: #34a853;
+  font-weight: 600;
+}
+
+/* Current */
+.stepper-step.current .step-circle {
+  border-color: #1a73e8;
+  background: #e8f0fe;
+  box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.15);
+  animation: pulse-step 2s infinite;
+}
+.stepper-step.current .step-label {
+  color: #1a73e8;
+  font-weight: 700;
+}
+
+@keyframes pulse-step {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.15); }
+  50% { box-shadow: 0 0 0 8px rgba(26, 115, 232, 0.08); }
+}
+
+/* Rejected */
+.stepper-step.rejected .step-circle {
+  background: #ea4335;
+  border-color: #ea4335;
+  color: #fff;
+  font-weight: 700;
+}
+.stepper-step.rejected .step-label {
+  color: #ea4335;
+  font-weight: 600;
+}
+
+/* Upcoming */
+.stepper-step.upcoming .step-circle {
+  opacity: 0.5;
+}
+
+/* Connector lines */
+.stepper-connector {
+  flex: 1;
+  height: 3px;
+  background: #dadce0;
+  margin-top: 22px;
+  min-width: 20px;
+  transition: background 0.3s;
+}
+.stepper-connector.completed {
+  background: #34a853;
+}
+
+/* ===== Compact Stepper ===== */
+.workflow-stepper-compact {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 6px 0;
+}
+
+.step-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #e8eaed;
+  border: 2px solid #dadce0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  color: #fff;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+.step-dot.completed {
+  background: #34a853;
+  border-color: #34a853;
+}
+
+.step-dot.current {
+  border-color: #1a73e8;
+  background: #e8f0fe;
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+}
+
+.step-dot.rejected {
+  background: #ea4335;
+  border-color: #ea4335;
+}
+
+.step-line {
+  width: 16px;
+  height: 2px;
+  background: #dadce0;
+  transition: background 0.3s;
+}
+.step-line.completed {
+  background: #34a853;
+}

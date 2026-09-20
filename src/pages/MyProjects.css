@@ -1,0 +1,251 @@
+.my-projects-container { padding: 2rem; }
+
+.my-projects-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 2rem; flex-wrap: wrap; gap: 16px;
+}
+.my-projects-header h1 { margin: 0; font-size: 1.8rem; font-weight: 600; color: #202124; }
+.my-projects-header p { margin: 4px 0 0; color: #5f6368; }
+
+.submit-new-btn {
+  background: linear-gradient(135deg, #34a853, #1e8e3e);
+  color: #fff; padding: 12px 24px; border-radius: 10px;
+  text-decoration: none; font-weight: 600; transition: all 0.2s;
+  display: inline-block;
+}
+.submit-new-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(52,168,83,0.3); }
+
+/* Access Info */
+.access-info-banner {
+  display: flex; align-items: center; gap: 12px;
+  background: #fef7e0; border: 1px solid #fdd835; border-radius: 10px;
+  padding: 12px 20px; margin-bottom: 20px;
+}
+.access-info-banner span { font-size: 1.3rem; }
+.access-info-banner p { margin: 0; color: #5f6368; font-size: 0.9rem; }
+.access-info-banner a { color: #1a73e8; font-weight: 600; }
+
+/* Stats */
+.ngo-stats-grid {
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: 12px; margin-bottom: 2rem;
+}
+.ngo-stat {
+  background: #fff; border: 1px solid #e8eaed; border-radius: 10px;
+  padding: 16px; text-align: center;
+}
+.ngo-stat-value { display: block; font-size: 1.6rem; font-weight: 700; color: #202124; }
+.ngo-stat span:last-child { font-size: 0.75rem; color: #5f6368; }
+.ngo-stat.approved { border-left: 3px solid #34a853; }
+.ngo-stat.pending { border-left: 3px solid #fbbc05; }
+.ngo-stat.rejected { border-left: 3px solid #ea4335; }
+.ngo-stat.tokens { border-left: 3px solid #1a73e8; }
+.ngo-stat.listed { border-left: 3px solid #9c27b0; }
+
+/* Project Cards */
+.ngo-projects-list { display: flex; flex-direction: column; gap: 16px; }
+
+.ngo-project-card {
+  background: #fff; border: 1px solid #e8eaed; border-radius: 14px;
+  padding: 24px; transition: all 0.2s;
+}
+.ngo-project-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+
+.ngo-project-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 16px; gap: 12px;
+}
+.ngo-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.ngo-pid-badge {
+  font-family: monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #1a73e8;
+  background-color: #f1f3f4;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.ngo-project-header h3 { margin: 0; font-size: 1.15rem; color: #202124; }
+
+.ngo-lifecycle-wrap {
+  margin: 14px 0 10px 0;
+  border-top: 1px solid var(--color-border-light, #f0f0f0);
+  padding-top: 10px;
+}
+
+.ngo-last-activity-bar {
+  background: #f8f9fa;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  color: #5f6368;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.ngo-last-activity-bar strong {
+  color: #3c4043;
+}
+
+.last-activity-date {
+  color: #70757a;
+  font-size: 0.7rem;
+}
+
+.ngo-badge-tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ngo-evidence-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+}
+.ngo-evidence-badge.has-evidence {
+  background-color: #e6f4ea;
+  color: #1e8e3e;
+  border: 1px solid rgba(52, 168, 83, 0.2);
+}
+.ngo-evidence-badge.no-evidence {
+  background-color: #fef7e0;
+  color: #b06000;
+  border: 1px solid rgba(251, 188, 5, 0.3);
+}
+
+.ngo-mrv-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+}
+.ngo-mrv-pill.draft { background-color: #f1f3f4; color: #5f6368; }
+.ngo-mrv-pill.submitted { background-color: #e8f0fe; color: #1a73e8; border: 1px solid rgba(26, 115, 232, 0.2); }
+.ngo-mrv-pill.under_review { background-color: #e0f2fe; color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.2); }
+.ngo-mrv-pill.approved,
+.ngo-mrv-pill.verified { background-color: #e6f4ea; color: #137333; border: 1px solid rgba(52, 168, 83, 0.2); }
+
+.ngo-project-meta { margin: 0 0 4px 0; color: #5f6368; font-size: 0.85rem; }
+
+.ngo-mrv-quick-stats {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  color: #5f6368;
+}
+
+.mrv-qs-item strong {
+  color: #3c4043;
+}
+
+.ngo-status-badge {
+  padding: 4px 12px; border-radius: 16px; font-size: 0.75rem;
+  font-weight: 600; color: #fff; flex-shrink: 0;
+}
+.ngo-status-badge.approved { background: #34a853; }
+.ngo-status-badge.pending { background: #fbbc05; color: #202124; }
+.ngo-status-badge.rejected { background: #ea4335; }
+
+/* Actions */
+.ngo-project-actions {
+  display: flex; align-items: center; gap: 12px; margin-top: 16px;
+  padding-top: 16px; border-top: 1px solid #f1f3f4;
+}
+
+.ngo-view-btn {
+  background: #f1f3f4; color: #202124; padding: 8px 16px;
+  border-radius: 8px; text-decoration: none; font-weight: 500;
+  font-size: 0.85rem; transition: background 0.2s;
+}
+.ngo-view-btn:hover { background: #e8eaed; }
+
+.ngo-sell-btn {
+  background: #1a73e8; color: #fff; border: none; padding: 8px 16px;
+  border-radius: 8px; font-weight: 600; font-size: 0.85rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.ngo-sell-btn:hover { background: #185abc; }
+
+.ngo-listed-badge {
+  background: #e6f4ea; color: #1e8e3e; padding: 6px 12px;
+  border-radius: 8px; font-size: 0.8rem; font-weight: 500;
+}
+
+.ngo-resubmit-btn {
+  background: #fce8e6; color: #c5221f; padding: 8px 16px;
+  border-radius: 8px; text-decoration: none; font-weight: 500;
+  font-size: 0.85rem; transition: background 0.2s;
+}
+.ngo-resubmit-btn:hover { background: #f8d7da; }
+
+/* No Projects */
+.no-projects-card {
+  text-align: center; padding: 50px 20px;
+  background: #fff; border: 1px dashed #dadce0; border-radius: 14px;
+}
+.no-projects-card span { font-size: 3rem; }
+.no-projects-card h3 { margin: 12px 0 4px; }
+.no-projects-card p { color: #5f6368; margin: 0 0 20px; }
+
+/* Sell Modal */
+.sell-project-name { font-weight: 600; color: #202124; margin: 0 0 16px; }
+.sell-total { color: #1a73e8; font-weight: 500; margin: 8px 0 0; }
+.sell-error { color: #ea4335; font-weight: 500; }
+.sell-success { text-align: center; padding: 20px; }
+.sell-success span { font-size: 2.5rem; }
+.sell-success p { color: #1e8e3e; font-weight: 500; margin: 12px 0 0; }
+
+/* Modal reuse */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center; z-index: 1000;
+}
+.modal-content {
+  background: #fff; border-radius: 16px; padding: 32px;
+  max-width: 500px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+}
+.modal-content h2 { margin: 0 0 4px; }
+.modal-form { display: flex; flex-direction: column; gap: 12px; }
+.modal-form label { font-weight: 500; font-size: 0.9rem; }
+.modal-form input {
+  padding: 10px 14px; border: 1px solid #dadce0; border-radius: 8px; font-size: 0.95rem;
+}
+.modal-actions { display: flex; gap: 12px; margin-top: 8px; }
+.modal-cancel {
+  flex: 1; padding: 12px; background: #f1f3f4; border: 1px solid #dadce0;
+  border-radius: 8px; font-weight: 600; cursor: pointer;
+}
+.modal-submit {
+  flex: 1; padding: 12px; background: #1a73e8; color: #fff; border: none;
+  border-radius: 8px; font-weight: 600; cursor: pointer;
+}
+.modal-submit:hover { background: #185abc; }
+.modal-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@media (max-width: 1024px) {
+  .ngo-stats-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  .ngo-stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .ngo-project-actions { flex-wrap: wrap; }
+}

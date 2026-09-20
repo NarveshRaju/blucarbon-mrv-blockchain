@@ -1,0 +1,112 @@
+.sidebar {
+  width: 260px;
+  background-color: #ffffff;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e0e0e0;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* --- Logo Container --- */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.logo-container:hover {
+  background-color: #f8fafc;
+  opacity: 0.9;
+}
+
+.logo-icon {
+  color: #1a73e8;
+  flex-shrink: 0;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.logo-main-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #202124;
+}
+
+.logo-byline {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: #5f6368;
+  letter-spacing: 0.05em;
+}
+
+/* --- Role Badge --- */
+.role-badge-container {
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+
+.sidebar-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #e8f0fe;
+  color: #1967d2;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* --- Navigation --- */
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-section-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #9aa0a6;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 16px 20px 6px;
+  margin-top: 4px;
+}
+
+.nav-item {
+  padding: 12px 20px;
+  margin-bottom: 2px;
+  text-decoration: none;
+  color: #5f6368;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: background-color 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-item:hover {
+  background-color: #f1f3f4;
+  color: #202124;
+}
+
+.nav-item.active {
+  background-color: #e8f0fe;
+  color: #1a73e8;
+  font-weight: 600;
+}

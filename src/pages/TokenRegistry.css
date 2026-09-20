@@ -1,0 +1,53 @@
+.token-registry-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.summary-card {
+  background-color: #e3f2fd; /* Light blue */
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #bbdefb;
+}
+
+.card-title { font-weight: 500; color: #1e88e5; }
+.card-value { font-size: 2.5rem; font-weight: bold; margin: 10px 0; }
+.card-label { color: #5f6368; }
+
+.credit-registry {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.credit-registry h2 { margin: 0 0 5px 0; }
+.credit-registry p { margin: 0 0 20px 0; color: #5f6368; }
+
+.registry-list { display: flex; flex-direction: column; gap: 15px; }
+
+.registry-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.item-details h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 5px 0; }
+.verified-tag { font-size: 0.8rem; background-color: #e8f5e9; color: #388e3c; padding: 4px 8px; border-radius: 12px; }
+.item-details p { margin: 0 0 10px 0; color: #5f6368; }
+.item-meta { display: flex; gap: 15px; font-size: 0.9rem; color: #3c4043; }
+
+.item-credits { text-align: right; }
+.bct-tokens { font-size: 1.5rem; font-weight: bold; color: #1976d2; }
+.bct-label { color: #5f6368; font-size: 0.9rem; }
+.trees-count { margin-top: 5px; color: #3c4043; }

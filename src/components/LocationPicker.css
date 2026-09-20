@@ -1,0 +1,233 @@
+/* ============================================================
+   LocationPicker Styles (Phase 6 Enhancement)
+   ============================================================ */
+
+.location-picker-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.lp-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.lp-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary, #5f6368);
+}
+
+.lp-hint svg {
+  color: var(--color-primary, #1a73e8);
+  flex-shrink: 0;
+}
+
+.lp-geolocate-btn {
+  background: var(--color-bg-page, #f8f9fa);
+  border: 1px solid var(--color-border, #e0e0e0);
+  border-radius: var(--radius-sm, 6px);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-primary, #1a73e8);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition-fast, 150ms ease);
+}
+
+.lp-geolocate-btn:hover {
+  background: var(--color-primary-light, #e8f0fe);
+  border-color: var(--color-primary, #1a73e8);
+}
+
+.lp-geo-error {
+  background-color: var(--color-warning-light, #fef7e0);
+  color: var(--color-warning-dark, #f29900);
+  border: 1px solid rgba(242, 153, 0, 0.3);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm, 6px);
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lp-map-wrapper {
+  width: 100%;
+  height: 360px;
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  border: 1px solid var(--color-border, #e0e0e0);
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0,0,0,0.06));
+  position: relative;
+  z-index: 1;
+}
+
+.lp-leaflet-map {
+  width: 100%;
+  height: 100%;
+}
+
+.lp-map-status-overlay {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--color-border-light, #f0f0f0);
+  padding: 6px 12px;
+  border-radius: var(--radius-md, 8px);
+  box-shadow: var(--shadow-sm, 0 2px 6px rgba(0,0,0,0.1));
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #202124);
+  z-index: 1000;
+}
+
+.lp-coordinates-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--color-bg-page, #f8f9fa);
+  border: 1px solid var(--color-border-light, #f0f0f0);
+  border-radius: var(--radius-lg, 12px);
+  padding: 16px 20px;
+}
+
+.lp-inputs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.lp-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lp-input-group label {
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--color-text-secondary, #5f6368);
+}
+
+.req-star {
+  color: var(--color-error, #ea4335);
+}
+
+.lp-field-hint {
+  font-size: 0.72rem;
+  color: var(--color-text-muted, #9aa0a6);
+}
+
+.lp-field-error {
+  font-size: 0.72rem;
+  color: var(--color-error, #ea4335);
+  font-weight: 500;
+}
+
+.lp-radius-input-wrap {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.lp-radius-input-wrap input {
+  padding-right: 60px;
+}
+
+.lp-radius-unit {
+  position: absolute;
+  right: 12px;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary, #5f6368);
+  pointer-events: none;
+}
+
+/* Radius Slider Control Box */
+.lp-radius-slider-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border-light, #e8eaed);
+}
+
+.lp-slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+}
+
+.lp-slider-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-secondary, #5f6368);
+  font-weight: 500;
+}
+
+.lp-slider-value {
+  color: var(--color-secondary-hover, #0b7f8a);
+}
+
+.lp-slider-control {
+  width: 100%;
+  accent-color: var(--color-secondary, #0e9aa7);
+  cursor: pointer;
+}
+
+.lp-slider-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--color-text-muted, #9aa0a6);
+}
+
+/* Academic Disclaimer Notice */
+.lp-academic-notice {
+  background-color: var(--color-secondary-light, #e0f7fa);
+  border: 1px solid rgba(14, 154, 167, 0.25);
+  border-radius: var(--radius-md, 8px);
+  padding: 12px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.82rem;
+  color: var(--color-secondary-hover, #0b7f8a);
+  line-height: 1.45;
+}
+
+.lp-academic-notice svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.lp-academic-notice p {
+  margin: 2px 0 0 0;
+}
+
+@media (max-width: 768px) {
+  .lp-map-wrapper {
+    height: 280px;
+  }
+  .lp-inputs-grid {
+    grid-template-columns: 1fr;
+  }
+}

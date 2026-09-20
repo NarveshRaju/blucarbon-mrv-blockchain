@@ -1,0 +1,179 @@
+/* ============================================================
+   AnalysisZoneMap Component Styles
+   ============================================================ */
+
+.analysis-zone-map-container {
+  background: var(--color-bg-card, #ffffff);
+  border: 1px solid var(--color-border-light, #f0f0f0);
+  border-radius: var(--radius-xl, 16px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0,0,0,0.06));
+}
+
+.azm-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border-light, #f0f0f0);
+  background: var(--color-bg-page, #f8f9fa);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.azm-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.azm-title strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--color-text-primary, #202124);
+}
+
+.azm-title span {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary, #5f6368);
+}
+
+.azm-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.azm-radius-badge {
+  background-color: var(--color-secondary-light, #e0f7fa);
+  color: var(--color-secondary-hover, #0b7f8a);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: var(--radius-full, 9999px);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(14, 154, 167, 0.2);
+}
+
+.azm-map-wrapper {
+  width: 100%;
+  height: 320px;
+  position: relative;
+  z-index: 1;
+}
+
+.azm-leaflet-map {
+  width: 100%;
+  height: 100%;
+}
+
+.azm-popup {
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.azm-popup strong {
+  color: #202124;
+}
+
+.azm-popup p {
+  margin: 2px 0 4px 0;
+  color: #5f6368;
+}
+
+.azm-popup small {
+  font-family: var(--font-mono);
+  color: #1a73e8;
+}
+
+.azm-footer-grid {
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 1.2fr 1.8fr;
+  gap: 16px;
+  align-items: center;
+  background: #ffffff;
+  border-top: 1px solid var(--color-border-light, #f0f0f0);
+}
+
+.azm-coord-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.82rem;
+}
+
+.azm-coord-readout div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.azm-label {
+  color: var(--color-text-secondary, #5f6368);
+  font-size: 0.78rem;
+  min-width: 110px;
+}
+
+.azm-coord-readout code {
+  font-family: var(--font-mono);
+  color: var(--color-primary-dark, #0d47a1);
+  background: var(--color-bg-page, #f8f9fa);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.azm-disclaimer-note {
+  background-color: var(--color-info-light, #e8f0fe);
+  border: 1px solid rgba(26, 115, 232, 0.2);
+  border-radius: var(--radius-md, 8px);
+  padding: 10px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: var(--color-primary-dark, #0d47a1);
+  line-height: 1.4;
+}
+
+.azm-disclaimer-note svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Empty Card State for Legacy Projects */
+.analysis-zone-empty-card {
+  background: var(--color-bg-page, #f8f9fa);
+  border: 1px dashed var(--color-border, #e0e0e0);
+  border-radius: var(--radius-lg, 12px);
+  padding: 24px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.analysis-zone-empty-card h4 {
+  margin: 0 0 4px 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #202124);
+}
+
+.analysis-zone-empty-card p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary, #5f6368);
+}
+
+@media (max-width: 768px) {
+  .azm-footer-grid {
+    grid-template-columns: 1fr;
+  }
+  .azm-map-wrapper {
+    height: 250px;
+  }
+}

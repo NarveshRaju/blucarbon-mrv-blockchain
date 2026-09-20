@@ -1,0 +1,103 @@
+/* --- Main Header Container --- */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 32px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* --- Role Pill Styling --- */
+.header-role-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f1f3f4;
+  border: 1px solid #dadce0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.header-role-pill:hover {
+  background-color: #e8f0fe;
+  border-color: #1a73e8;
+}
+
+.role-pill-icon {
+  font-size: 1rem;
+}
+
+.role-pill-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #202124;
+}
+
+.role-pill-switch {
+  font-size: 0.75rem;
+  color: #1a73e8;
+  font-weight: 600;
+  background: #ffffff;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-left: 4px;
+}
+
+/* --- Container for Admin Badge and Button --- */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* --- Admin Badge Styling --- */
+.admin-badge {
+  background-color: #e8f0fe;
+  color: #1967d2;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* --- Connect Button Styling --- */
+.connect-button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+
+  background-color: #1a73e8;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.connect-button:hover {
+  background-color: #185abc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.connect-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

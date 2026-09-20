@@ -1,0 +1,105 @@
+/* ============================================================
+   BaselineDataForm Component Styles
+   ============================================================ */
+
+.baseline-form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.baseline-info-banner {
+  background-color: var(--color-info-light, #e8f0fe);
+  border: 1px solid rgba(26, 115, 232, 0.25);
+  border-radius: var(--radius-lg, 12px);
+  padding: 16px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  color: var(--color-primary-dark, #0d47a1);
+}
+
+.baseline-info-banner svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.baseline-info-banner strong {
+  display: block;
+  font-size: 0.92rem;
+  margin-bottom: 3px;
+}
+
+.baseline-info-banner p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--color-text-secondary, #5f6368);
+}
+
+.baseline-section {
+  background: #ffffff;
+  border: 1px solid var(--color-border-light, #e8eaed);
+  border-radius: var(--radius-lg, 12px);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0,0,0,0.05));
+}
+
+.baseline-section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border-bottom: 1px solid var(--color-border-light, #f0f0f0);
+  padding-bottom: 12px;
+}
+
+.baseline-section-header svg {
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.baseline-section-header h3 {
+  margin: 0 0 2px 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #202124);
+}
+
+.baseline-section-header p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--color-text-secondary, #5f6368);
+}
+
+.baseline-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.baseline-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.baseline-footer-note {
+  background: var(--color-bg-page, #f8f9fa);
+  border: 1px dashed var(--color-border, #e0e0e0);
+  border-radius: var(--radius-md, 8px);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.82rem;
+  color: var(--color-text-secondary, #5f6368);
+}
+
+.baseline-footer-note svg {
+  color: var(--color-primary, #1a73e8);
+  flex-shrink: 0;
+}
