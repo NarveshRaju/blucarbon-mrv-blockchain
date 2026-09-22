@@ -20,7 +20,7 @@ export default function Dashboard() {
     try {
       if (ngo && !userAddress) { setProjects([]); return; }
       setProjects(await getProjects(ngo ? { walletAddress: userAddress } : {}));
-    } catch { setError('Projects could not be loaded. Try again.'); }
+    } catch (err) { setError(err.message || 'Projects could not be loaded. Try again.'); }
     finally { setLoading(false); }
   }, [ngo, userAddress]);
   useEffect(() => { load(); }, [load]);

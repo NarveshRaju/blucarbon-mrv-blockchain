@@ -25,9 +25,19 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use(config => {
+  if (API_BASE_URL === '/api') {
+    throw new Error('Backend URL is not configured. Set REACT_APP_API_URL to the Render backend URL in Vercel and redeploy.');
+  }
   const token = sessionStorage.getItem('bcd_validator_session');
   if (token) config.headers.Authorization = 'Bearer ' + token;
   return config;
+});
+
+apiClient.interceptors.response.use(response => {
+  if (typeof response.data === 'string' && /<\s*(?:!doctype|html)/i.test(response.data)) {
+    throw new Error('The API returned a web page instead of project data. Check REACT_APP_API_URL in Vercel and redeploy.');
+  }
+  return response;
 });
 
 export default apiClient;

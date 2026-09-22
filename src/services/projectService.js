@@ -15,6 +15,7 @@ import apiClient from './api';
  */
 export const getProjects = async (params = {}) => {
   const response = await apiClient.get('/projects-for-sale', { params });
+  if (!Array.isArray(response.data)) throw new Error('The backend returned an invalid project list. Check the deployed API URL.');
   return response.data;
 };
 
@@ -30,6 +31,7 @@ export const getMyProjects = async (walletAddress) => {
   const response = await apiClient.get('/forms', {
     params: { walletAddress: walletAddress.toLowerCase().trim(), role: 'ngo' }
   });
+  if (!Array.isArray(response.data)) throw new Error('The backend returned an invalid project list. Check the deployed API URL.');
   return response.data;
 };
 
