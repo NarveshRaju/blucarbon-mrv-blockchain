@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 
 // Import providers
-import { Web3Provider, useWeb3 } from './Web3Context'; 
+import { Web3Provider, useWeb3 } from './Web3Context';
 import { RoleProvider, useRole } from './RoleContext';
 
 // Import layout components
@@ -69,8 +69,9 @@ function MainLayout() {
           <Route path="/ngo/submit" element={<SubmitProject />} />
           <Route path="/submit" element={<SubmitProject />} />
           <Route path="/submit-project" element={<SubmitProject />} />
-          <Route path="/ngo/projects" element={<MyProjects />} />
-          <Route path="/my-projects" element={<MyProjects />} />
+          <Route path="/ngo/projects" element={<Dashboard />} />
+          <Route path="/my-projects" element={<Dashboard />} />
+          <Route path="/demo/project-listings" element={<MyProjects />} />
 
           {/* AI Pre-Verification & Validator Review Routes */}
           <Route path="/ai-verification" element={<AIVerification />} />
@@ -112,4 +113,4 @@ function App() {
   );
 }
 
-export default App;
+export default App;

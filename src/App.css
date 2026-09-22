@@ -18,10 +18,21 @@ body {
 }
 
 .main-content {
+  min-width: 0;
   flex-grow: 1;
   padding: 30px;
   overflow-y: auto;
   height: 100vh;
+}
+
+@media (max-width: 700px) {
+  .app-container { flex-direction: column; }
+  .app-container .sidebar { width: 100%; min-width: 0; height: auto; box-sizing: border-box; border-right: 0; border-bottom: 1px solid #dbe4df; padding: 14px; }
+  .sidebar .nav-menu { flex-direction: row; flex-wrap: wrap; gap: 4px; }
+  .sidebar .nav-section-label { display: none; }
+  .sidebar .secondary-nav { flex-basis: 100%; }
+  .main-content { height: auto; padding: 14px; }
+  .app-header { flex-wrap: wrap; gap: 10px; }
 }
 
 .landing-main-content {

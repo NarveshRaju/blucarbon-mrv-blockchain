@@ -1,0 +1,33 @@
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const ganache = require('ganache');
+const { BrowserProvider, ContractFactory, parseUnits, ZeroAddress } = require('ethers');
+const { compileContract } = require('./scripts/compile-contract');
+
+test('replacement contract enforces ownership and one issuance per project on an EVM', async t => {
+  const rpc = ganache.provider({ logging: { quiet: true }, chain: { hardfork: 'shanghai' }, wallet: { totalAccounts: 3 } });
+  const provider = new BrowserProvider(rpc);
+  t.after(async () => { provider.destroy(); await rpc.disconnect(); });
+  const owner = await provider.getSigner(0);
+  const ngo = await provider.getSigner(1);
+  const artifact = compileContract();
+  const contract = await new ContractFactory(artifact.abi, artifact.bytecode, owner).deploy(await owner.getAddress());
+  await contract.waitForDeployment();
+  assert.equal(await contract.owner(), await owner.getAddress());
+  assert.equal(await contract.totalSupply(), 0n);
+  const amount = parseUnits('12', 18);
+  const recipient = await ngo.getAddress();
+  await assert.rejects(contract.connect(ngo).mintAndRecordApproval(recipient, amount, 'project-1'));
+  await assert.rejects(contract.mintAndRecordApproval(ZeroAddress, amount, 'project-1'));
+  await assert.rejects(contract.mintAndRecordApproval(recipient, 0, 'project-1'));
+  await assert.rejects(contract.mintAndRecordApproval(recipient, amount, ''));
+  const receipt = await (await contract.mintAndRecordApproval(recipient, amount, 'project-1')).wait();
+  assert.equal(receipt.status, 1);
+  assert.equal(await contract.balanceOf(recipient), amount);
+  assert.equal(await contract.totalSupply(), amount);
+  await assert.rejects(contract.mintAndRecordApproval(recipient, amount + 1n, 'project-1'));
+  assert.equal(await contract.totalSupply(), amount);
+  const approval = receipt.logs.map(log => contract.interface.parseLog(log)).find(log => log.name === 'ApprovalRecord');
+  assert.equal(approval.args.recipient, recipient);
+  assert.equal(approval.args.amountMinted, amount);
+});

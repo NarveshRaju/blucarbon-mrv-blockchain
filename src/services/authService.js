@@ -100,6 +100,7 @@ export async function loginValidator(validatorId, password, walletAddress) {
       };
     }
 
+    if (data.sessionToken) sessionStorage.setItem('bcd_validator_session', data.sessionToken);
     if (walletAddress) {
       saveRoleAuth('validator', walletAddress, data.validator);
     }
@@ -185,6 +186,7 @@ export function getRoleAuth(role, walletAddress) {
  * Clear authenticated role session
  */
 export function clearRoleAuth(role, walletAddress) {
+  if (role === 'validator') sessionStorage.removeItem('bcd_validator_session');
   if (!role || !walletAddress) return;
   const key = `${AUTH_STORAGE_PREFIX}${role}_${walletAddress.toLowerCase().trim()}`;
   localStorage.removeItem(key);

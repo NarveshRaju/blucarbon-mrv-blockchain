@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, TreePine, Leaf, Eye } from 'lucide-react';
-import StatusBadge from './ui/StatusBadge';
+import { getProjectJourney } from '../utils/projectJourney';
 import { normalizeProjectForExplorer } from '../utils/projectExplorerUtils';
 import { formatProjectId } from '../utils/projectStatus';
 import './ProjectCard.css';
@@ -54,7 +54,7 @@ const ProjectCard = ({
         )}
         {project.status && (
           <div className="project-card__status-overlay">
-            <StatusBadge status={project.status} />
+            <span>{getProjectJourney(project).label}</span>
           </div>
         )}
       </div>
@@ -65,6 +65,7 @@ const ProjectCard = ({
           <div>
             <span className="project-card__pid">{formatProjectId(id)}</span>
             <h3 className="project-card__name">{name}</h3>
+            <p>{getProjectJourney(project).next}</p>
           </div>
           <div className="project-card__badges">
             <span className={`project-card__evidence-badge ${normalized.evidenceCount > 0 ? 'has-evidence' : 'no-evidence'}`}>

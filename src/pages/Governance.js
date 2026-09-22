@@ -300,6 +300,7 @@ const Governance = () => {
       <header className="governance-header">
         <div>
           <h1>DAO Governance Consensus</h1>
+          <p><strong>These proposal votes are saved in this browser.</strong> Finalize a real project's approval in its Tokens &amp; transaction panel to automatically submit minting. A validator login is required; no owner wallet signature is needed. View receipts in the <a href="/token-registry">Token Registry</a>.</p>
           <p>Democratic, 7-day consensus voting on validated Blue Carbon proposals (10 votes maximum &bull; &gt;50% threshold to pass).</p>
         </div>
         <div className="governance-stats">

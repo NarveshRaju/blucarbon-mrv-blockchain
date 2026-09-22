@@ -1,5 +1,9 @@
 # Getting Started with Create React App
 
+## Free public blockchain demo
+
+See [Sepolia setup and recovery](docs/FREE_BLOCKCHAIN_DEMO.md). Minting uses a backend relayer funded with free test ETH. Users pay no gas; test tokens have no monetary value. Configure the backend owner wallet, Sepolia RPC and contract before using minting.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

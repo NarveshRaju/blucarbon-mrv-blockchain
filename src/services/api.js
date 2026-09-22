@@ -11,17 +11,23 @@ const getBaseUrl = () => {
   ) {
     return 'http://localhost:5000';
   }
-  return 'https://blockchain-blue-carbon-mrv.onrender.com';
+  return '/api';
 };
 
 const API_BASE_URL = getBaseUrl();
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000,
+  timeout: 90000,
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+apiClient.interceptors.request.use(config => {
+  const token = sessionStorage.getItem('bcd_validator_session');
+  if (token) config.headers.Authorization = 'Bearer ' + token;
+  return config;
 });
 
 export default apiClient;

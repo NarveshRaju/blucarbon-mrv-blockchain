@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: bluecarbon-demo-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci --prefix src/backend --omit=dev
+    startCommand: npm start --prefix src/backend
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 22.16.0
+      - key: NODE_ENV
+        value: production
+      - key: FRONTEND_URL
+        sync: false
+      - key: MONGO_URI
+        sync: false
+      - key: ALCHEMY_SEPOLIA_RPC_URL
+        sync: false
+      - key: CONTRACT_ADDRESS
+        sync: false
+      - key: ADMIN_PRIVATE_KEY
+        sync: false

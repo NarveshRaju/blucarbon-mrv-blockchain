@@ -1,0 +1,9 @@
+.project-mint-status { margin: 24px 0; padding: 24px; border: 1px solid #bfd6cb; border-radius: 12px; background: #f4faf7; color: #163c2e; }
+.project-mint-status h2 { margin-top: 0; }
+.project-mint-status dl { display: grid; gap: 14px; }
+.project-mint-status dt { font-size: 0.85rem; color: #466356; }
+.project-mint-status dd { margin: 4px 0 0; overflow-wrap: anywhere; }
+.project-mint-status code { overflow-wrap: anywhere; }
+.mint-status-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; margin: 20px 0; }
+.mint-status-actions button { border: 1px solid #427460; padding: 10px 16px; border-radius: 8px; cursor: pointer; background: white; color: #163c2e; }
+.mint-status-actions button:disabled { opacity: 0.6; cursor: wait; }

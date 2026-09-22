@@ -4,7 +4,7 @@ import { useRole } from '../RoleContext';
 import './Header.css';
 
 const Header = () => {
-  const { userAddress, isAdmin, connectWallet, disconnectWallet } = useWeb3();
+  const { userAddress, isAdmin, connectWallet, disconnectWallet, error } = useWeb3();
   const { role, ROLE_LABELS, ROLE_ICONS, setShowRoleSelector } = useRole();
 
   const buttonText = userAddress
@@ -45,6 +45,7 @@ const Header = () => {
         )}
       </div>
       <div className="header-actions">
+        <span title={error || 'Backend pays gas with free test ETH'}>Sepolia demo{error ? ' · unavailable' : ' · no user gas'}</span>
         {isAdmin && <span className="admin-badge">Admin</span>}
         <button className="connect-button" onClick={handleClick}>
           {buttonText}

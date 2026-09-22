@@ -115,7 +115,7 @@ const INITIAL_FORM_STATE = {
 
 const SubmitProject = () => {
   const { userAddress, connectWallet, loading: walletLoading } = useWeb3();
-  const { role, ROLES } = useRole();
+  const { role, ROLES, setShowRoleSelector } = useRole();
 
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState(INITIAL_FORM_STATE);
@@ -470,7 +470,7 @@ const SubmitProject = () => {
     { key: 'location', label: 'Location & Map', icon: <MapPin size={16} /> },
     { key: 'land', label: 'Land & Scope', icon: <TreePine size={16} /> },
     { key: 'evidence', label: 'Evidence Files', icon: <UploadCloud size={16} /> },
-    { key: 'baseline', label: 'Baseline MRV', icon: <Activity size={16} /> },
+    { key: 'baseline', label: 'Starting measurements', icon: <Activity size={16} /> },
     { key: 'review', label: 'Review & Submit', icon: <CheckCircle2 size={16} /> },
   ];
 
@@ -484,7 +484,7 @@ const SubmitProject = () => {
           </div>
           <h2>Connect Wallet to Register a Project</h2>
           <p>
-            You must connect your authorized MetaMask wallet to submit blue carbon restoration projects and establish on-chain stewardship.
+            Connect your own wallet so the project and its future demo tokens can be linked to you. No payment is required.
           </p>
           <Button
             variant="primary"
@@ -502,7 +502,7 @@ const SubmitProject = () => {
   }
 
   // 2. Role Restriction (NGO and Admin only)
-  if (role && role !== ROLES.NGO && role !== ROLES.ADMIN) {
+  if (!role || (role !== ROLES.NGO && role !== ROLES.ADMIN)) {
     return (
       <div className="submit-page-container">
         <div className="submit-access-card">
@@ -514,10 +514,10 @@ const SubmitProject = () => {
             Project registration is reserved for <strong>NGO Project Developers</strong>. You are currently signed in with the role of <strong>{role}</strong>.
           </p>
           <div className="sac-actions">
-            <Link to="/profile" className="bc-btn bc-btn--secondary">
-              Switch Role in Profile
-            </Link>
-            <Link to="/" className="bc-btn bc-btn--ghost">
+            <button onClick={() => setShowRoleSelector(true)} className="bc-btn bc-btn--secondary">
+              Choose NGO role
+            </button>
+            <Link to="/dashboard" className="bc-btn bc-btn--ghost">
               Back to Dashboard
             </Link>
           </div>
@@ -537,7 +537,7 @@ const SubmitProject = () => {
           </div>
           <h2>Project Submitted Successfully!</h2>
           <p className="ssc-subtitle">
-            Your blue carbon restoration project <strong>"{submitSuccess.projectName}"</strong> has been registered and is now queued for decentralized DAO validator review.
+            Your blue carbon restoration project <strong>"{submitSuccess.projectName}"</strong> has been saved. Next, open the project and run its checks. A validator will review the findings before tokens can be issued.
           </p>
 
           <div className="ssc-details-box">
@@ -547,7 +547,7 @@ const SubmitProject = () => {
             </div>
             <div className="ssc-detail-row">
               <span>Current Status:</span>
-              <span className="ssc-status-badge">Submitted (Waiting for Validator Review)</span>
+              <span className="ssc-status-badge">Submitted · ready for checks</span>
             </div>
             <div className="ssc-detail-row">
               <span>Location:</span>
@@ -561,14 +561,14 @@ const SubmitProject = () => {
 
           {/* Full Lifecycle Progression */}
           <div className="ssc-lifecycle-section">
-            <h4>Decentralized Verification & Issuance Journey</h4>
+            <h4>What happens next</h4>
             <ProjectLifecycle project={{ status: 'submitted' }} compact={false} />
           </div>
 
           <div className="ssc-actions">
             {submitSuccess.projectId && (
               <Link to={`/project/${submitSuccess.projectId}`} className="bc-btn bc-btn--primary">
-                <Eye size={16} /> View Project Details
+                <Eye size={16} /> Continue to project checks
               </Link>
             )}
             <Link to="/ngo/projects" className="bc-btn bc-btn--secondary">
@@ -599,8 +599,8 @@ const SubmitProject = () => {
       {/* Header */}
       <header className="submit-page-header">
         <div>
-          <h1>Project Registration Wizard</h1>
-          <p>Submit your blue carbon restoration project for geospatial analysis and DAO validation</p>
+          <h1>Submit a project</h1>
+          <p>Add the project details and evidence. After submitting, follow checks, review and token issuance on one project page.</p>
         </div>
         {draftStorageKey && (
           <div className="draft-actions">

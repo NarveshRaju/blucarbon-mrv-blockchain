@@ -1,0 +1,24 @@
+.journey-progress ol { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0; padding: 0; }
+.journey-progress li { display: flex; align-items: center; gap: 9px; padding: 10px 0; border-top: 3px solid #dce5e0; color: #65766d; font-size: .9rem; }
+.journey-progress li span { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #edf2ef; flex-shrink: 0; }
+.journey-progress .current { color: #145c42; border-color: #16835b; font-weight: 700; }
+.journey-progress .done { color: #145c42; border-color: #93bba6; }
+.journey-home { max-width: 1100px; margin: auto; padding: 28px 16px; color: #203b30; }
+.journey-home h1 { font-size: 2rem; margin: 0 0 10px; }
+.journey-home p { line-height: 1.6; }
+.journey-intro, .journey-next { padding: 24px; background: #f2f8f4; border: 1px solid #d2e1d8; border-radius: 14px; margin: 20px 0; }
+.journey-intro h2, .journey-next h2 { margin-top: 0; }
+.journey-primary { display: inline-block; padding: 11px 18px; border: 0; border-radius: 8px; background: #126644; color: white; text-decoration: none; cursor: pointer; font: inherit; }
+.journey-primary:disabled { opacity: .6; cursor: wait; }
+.journey-list { display: grid; gap: 12px; }
+.journey-row { padding: 20px; border: 1px solid #dbe4df; border-radius: 12px; display: flex; justify-content: space-between; gap: 20px; align-items: center; background: white; }
+.journey-row h3 { margin: 0 0 6px; }.journey-row p { margin: 6px 0; }.journey-row a { white-space: nowrap; }
+.journey-tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 18px 0; }
+.journey-tools button { padding: 9px 15px; border: 1px solid #abc3b5; border-radius: 8px; background: white; cursor: pointer; }
+.journey-tools button[aria-pressed="true"] { background: #dff0e5; font-weight: 700; }
+.journey-tools button.journey-primary { background: #126644; color: white; }
+.journey-details { border: 1px solid #dbe4df; border-radius: 10px; padding: 16px; margin: 16px 0; }
+.journey-details > summary { font-weight: 650; cursor: pointer; padding: 6px 0; }
+.journey-details[open] > summary { margin-bottom: 16px; }
+.sidebar .secondary-nav > summary { cursor: pointer; padding: 16px; font-size: .85rem; }
+@media(max-width: 650px) { .journey-progress ol { grid-template-columns: repeat(2, 1fr); } .journey-row { align-items: flex-start; flex-direction: column; } .journey-home { padding: 18px 8px; } }

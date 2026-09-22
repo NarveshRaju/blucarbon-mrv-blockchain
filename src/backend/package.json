@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test blockchain.test.js contract.test.js",
+    "contract:compile": "node scripts/compile-contract.js",
+    "contract:deploy": "node scripts/deploy-contract.js"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +26,9 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "mongodb-memory-server": "^11.2.0"
+    "@openzeppelin/contracts": "5.4.0",
+    "ganache": "7.9.2",
+    "mongodb-memory-server": "^11.2.0",
+    "solc": "0.8.30"
   }
 }

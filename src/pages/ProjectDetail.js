@@ -7,7 +7,7 @@ import SatelliteMLAudit from '../components/SatelliteMLAudit';
 import MRVSummary from '../components/MRVSummary';
 import ProjectLifecycle from '../components/ProjectLifecycle';
 import ProjectActivityTimeline from '../components/ProjectActivityTimeline';
-import { formatProjectId, getStatusConfig, normalizeStatus, getAvailableActions } from '../utils/projectStatus';
+import { formatProjectId, normalizeStatus } from '../utils/projectStatus';
 import { parseCoordinatesFromLocation } from '../utils/geoUtils';
 import {
   extractEvidenceFromProject,
@@ -30,45 +30,17 @@ import {
   Sprout,
   Trees,
   Calendar,
-  Globe,
-  CheckCircle2,
-  XCircle,
-  BrainCircuit,
-  AlertTriangle,
-  Sparkles
+  Globe
 } from 'lucide-react';
-import { formatUnits, parseUnits } from 'ethers';
 import './ProjectDetail.css';
-
-const AdminWalletInfo = () => {
-  const { contract, userAddress } = useWeb3();
-  const [balance, setBalance] = useState('0');
-
-  useEffect(() => {
-    const fetchBalance = async () => {
-      try {
-        if (!contract || !userAddress) return;
-        const adminBalance = await contract.balanceOf(userAddress);
-        setBalance(formatUnits(adminBalance, 18));
-      } catch (err) {
-        console.error("Failed to fetch admin balance:", err);
-      }
-    };
-    fetchBalance();
-  }, [contract, userAddress]);
-
-  return (
-    <div className="admin-wallet-info">
-      <h4>Admin Wallet</h4>
-      <p>Your BCT Balance: <strong>{parseFloat(balance).toLocaleString()}</strong> BCT</p>
-    </div>
-  );
-};
+import ProjectMintStatus from '../components/ProjectMintStatus';
+import { getProjectJourney } from '../utils/projectJourney';
+import '../components/Journey.css';
 
 const ProjectDetail = () => {
   const { projectId } = useParams();
-  const { contract, isAdmin, userAddress } = useWeb3();
-  const { role, ROLES } = useRole();
+  const { isAdmin, userAddress, refreshBlockchain, blockchainConfig } = useWeb3();
+  const { role, ROLES, setShowRoleSelector } = useRole();
 
   const [project, setProject] = useState(null);
   const [baselineData, setBaselineData] = useState(null);
@@ -80,6 +52,8 @@ const ProjectDetail = () => {
   const [txMessage, setTxMessage] = useState('');
   const [notification, setNotification] = useState('');
   const [selectedEvidenceImg, setSelectedEvidenceImg] = useState(null);
+  const [showSatellite, setShowSatellite] = useState(false);
+  const [needsLogin, setNeedsLogin] = useState(false);
 
   const evidenceList = useMemo(() => extractEvidenceFromProject(project), [project]);
 
@@ -100,22 +74,30 @@ const ProjectDetail = () => {
     fetchProjectData();
   }, [fetchProjectData]);
 
-  // Real-time event listener for on-chain approval
-  useEffect(() => {
-    if (contract && project) {
-      const onApproval = (offChainId) => {
-        if (offChainId === project._id) {
-          setNotification('This project was just approved on-chain!');
-          fetchProjectData();
-        }
-      };
-
-      contract.on("ApprovalRecord", onApproval);
-      return () => { contract.off("ApprovalRecord", onApproval); };
-    }
-  }, [contract, project, fetchProjectData]);
-
   // Handle voting (off-chain validator review)
+  useEffect(() => {
+    if (!project?.blockchainTx || ['confirmed', 'reverted'].includes(project.blockchainState)) return;
+    let cancelled = false;
+    const check = async () => {
+      try {
+        const { data } = await apiClient.get('/blockchain/projects/' + projectId + '/receipt');
+        if (!cancelled && data.confirmed) {
+          setTxMessage('Demo tokens confirmed on Sepolia. No real-money gas was paid.');
+          fetchProjectData();
+          refreshBlockchain(userAddress);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setTxMessage(err.response?.data?.error || 'Unable to check confirmation. Retry shortly.');
+          if (err.response?.status === 409) fetchProjectData();
+        }
+      }
+    };
+    check();
+    const interval = setInterval(check, 10000);
+    return () => { cancelled = true; clearInterval(interval); };
+  }, [project?.blockchainTx, project?.blockchainState, projectId, fetchProjectData, refreshBlockchain, userAddress]);
+
   const handleVote = async (voteType) => {
     setIsVoting(true);
     setError(null);
@@ -129,41 +111,34 @@ const ProjectDetail = () => {
       fetchProjectData();
     } catch (err) {
       setError(err.response?.data?.error || "An error occurred while voting.");
+      if (err.response?.status === 401) setNeedsLogin(true);
     } finally {
       setIsVoting(false);
     }
   };
 
-  // Handle token minting (on-chain by admin)
+  // Authenticated final approval triggers the backend relayer without a wallet signature.
   const handleMintTokens = async () => {
-    if (!contract || !project) return;
-
+    if (!project) return;
     setIsMinting(true);
-    setTxMessage("Preparing transaction...");
-
     try {
-      const recipientAddress = project.walletAddress;
-      const tokenAmount = parseUnits(project.saplingsPlanted.toString(), 18);
-      const offChainId = project._id;
-
-      setTxMessage("Please confirm the transaction in your wallet...");
-      const tx = await contract.mintAndRecordApproval(recipientAddress, tokenAmount, offChainId);
-
-      setTxMessage("Transaction sent! Waiting for confirmation on Sepolia...");
-      await tx.wait();
-
-      // Persist status update to MongoDB
-      await apiClient.patch(`/forms/${projectId}/status`, { status: 'credit_issued' });
-
-      setTxMessage('');
-      setNotification('BCT carbon credits minted successfully on Sepolia!');
+      if (project.blockchainTx) {
+        const { data } = await apiClient.get('/blockchain/projects/' + projectId + '/receipt');
+        setTxMessage(data.confirmed ? 'Confirmed on Sepolia.' : 'Still waiting for Sepolia confirmation.');
+        fetchProjectData();
+        await refreshBlockchain(userAddress);
+        return;
+      }
+      setTxMessage('Approving and submitting through the Sepolia relayer. No wallet signature is needed.');
+      const { data } = await apiClient.post('/blockchain/projects/' + projectId + '/approve', {}, { timeout: 60000 });
+      setTxMessage(data.confirmed ? 'Demo tokens confirmed on Sepolia.' : 'Transaction recorded. Use Check confirmation after it is mined.');
       fetchProjectData();
+      await refreshBlockchain(userAddress);
     } catch (err) {
-      console.error("Smart contract minting failed:", err);
-      setTxMessage(`Error: ${err.message || "Transaction failed."}`);
-    } finally {
-      setIsMinting(false);
-    }
+      setTxMessage(err.response?.data?.error || err.message || 'Mint request failed.');
+      if (err.response?.status === 401) setNeedsLogin(true);
+      fetchProjectData();
+    } finally { setIsMinting(false); }
   };
 
   // Load project Baseline data and MRV records (Phase 8)
@@ -197,14 +172,8 @@ const ProjectDetail = () => {
   const [selectedRunReport, setSelectedRunReport] = useState(null);
   const [analyzingStepText, setAnalyzingStepText] = useState('');
 
-  const statusConfig = useMemo(() => getStatusConfig(project), [project]);
-  const normStatus = useMemo(() => normalizeStatus(project), [project]);
-  const availableActions = useMemo(
-    () => getAvailableActions(project, role, userAddress),
-    [project, role, userAddress]
-  );
 
-  const isApproved = normStatus === 'approved' || normStatus === 'dao_approved' || normStatus === 'credit_issued';
+  const normStatus = useMemo(() => normalizeStatus(project), [project]);
   const projectGeo = parseCoordinatesFromLocation(project?.location);
 
   const aiReport = useMemo(() => {
@@ -238,7 +207,17 @@ const ProjectDetail = () => {
     }
   };
 
-  if (loading) return <div className="detail-loading"><p>Loading project details from MongoDB...</p></div>;
+  const journey = getProjectJourney(project || {});
+  const refreshReceipt = async () => {
+    setIsMinting(true);
+    try {
+      const { data } = await apiClient.get('/blockchain/projects/' + projectId + '/receipt');
+      setTxMessage(data.confirmed ? 'Tokens issued. Your project is complete.' : data.pending ? 'Waiting for network confirmation.' : 'No transaction recorded yet.');
+      fetchProjectData(); await refreshBlockchain(userAddress);
+    } catch (err) { setTxMessage(err.response?.data?.error || 'Unable to refresh. Please try again.'); }
+    finally { setIsMinting(false); }
+  };
+  if (loading) return <div className="detail-loading"><p>Loading project…</p></div>;
   if (error && !project) return <div className="detail-error"><p>{error}</p></div>;
   if (!project) return <div className="detail-error"><p>Project not found.</p></div>;
 
@@ -246,138 +225,9 @@ const ProjectDetail = () => {
     <div className="project-detail-container">
       {notification && <div className="realtime-notification">{notification}</div>}
 
-      <Link to={isValidator ? "/verification" : isNGO ? "/ngo/projects" : "/"} className="back-link">
+      <Link to={isValidator ? "/verification" : isNGO ? "/ngo/projects" : "/dashboard"} className="back-link">
         ← Back to {isValidator ? "Review Queue" : isNGO ? "My Projects" : "Dashboard"}
       </Link>
-
-      {/* Project Status & Lifecycle Banner (Phase 9) */}
-      <div className="detail-lifecycle-section">
-        <ProjectLifecycle project={project} />
-      </div>
-
-      {/* AI Pre-Verification Section (Real Multi-Module Engine) */}
-      {isAnalyzingAI || project?.aiVerification?.status === 'ai_processing' ? (
-        /* STATE 2: AI Processing State */
-        <div className="detail-ai-card processing" style={{ marginBottom: '1.5rem', padding: '1.5rem', borderRadius: '12px', border: '1px solid #93c5fd', background: '#eff6ff', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <BrainCircuit size={28} className="text-primary" style={{ animation: 'spin 2s linear infinite', flexShrink: 0 }} />
-          <div>
-            <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#1e40af' }}>Automated AI Pre-Verification in Progress...</h4>
-            <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: '#3b82f6' }}>
-              {analyzingStepText || 'Auditing project authenticity, geographic plausibility, SHA-256 evidence integrity, Sentinel-2 spectral data, and biophysical growth bounds.'}
-            </p>
-          </div>
-        </div>
-      ) : aiReport ? (
-        /* STATE 3 & 4: AI Report Completed / Requires Correction */
-        <div className={`detail-ai-card rec-${(aiReport.recommendation || 'flagged').toLowerCase()}`} style={{ marginBottom: '1.5rem', padding: '1.1rem 1.25rem', borderRadius: '12px', border: '1px solid #cbd5e1', background: '#f8fafc', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <div className="daic-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <div className="daic-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <BrainCircuit size={20} style={{ color: '#1a73e8' }} />
-              <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>AI Pre-Verification Status</h4>
-              {aiReport.runNumber && (
-                <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '2px 8px', borderRadius: 999, background: '#e2e8f0', color: '#334155' }}>
-                  Run #{aiReport.runNumber}
-                </span>
-              )}
-            </div>
-            <span
-              style={{
-                fontSize: '0.8rem',
-                fontWeight: 700,
-                padding: '0.25rem 0.65rem',
-                borderRadius: '999px',
-                background: aiReport.recommendation === 'PASS' ? '#e6f4ea' : aiReport.recommendation === 'FLAGGED' ? '#fef7e0' : '#fce8e6',
-                color: aiReport.recommendation === 'PASS' ? '#137333' : aiReport.recommendation === 'FLAGGED' ? '#b06000' : '#c5221f'
-              }}
-            >
-              {aiReport.recommendationLabel || aiReport.recommendation}
-            </span>
-          </div>
-
-          <div className="daic-body" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
-            <div className="daic-msg-row" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: '240px' }}>
-              {aiReport.recommendation === 'PASS' && <CheckCircle2 size={18} style={{ color: '#34a853', flexShrink: 0 }} />}
-              {aiReport.recommendation === 'FLAGGED' && <AlertTriangle size={18} style={{ color: '#fbbc05', flexShrink: 0 }} />}
-              {aiReport.recommendation === 'FAIL' && <XCircle size={18} style={{ color: '#ea4335', flexShrink: 0 }} />}
-              <p style={{ margin: 0, fontSize: '0.875rem', color: '#334155' }}>{aiReport.recommendationMessage || 'Automated pre-screening analysis completed.'}</p>
-            </div>
-
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              {isNGO && (aiReport.recommendation === 'FAIL' || aiReport.recommendation === 'FLAGGED') && (
-                <Link to={`/ngo/submit?projectId=${project.projectId || project._id}&step=5`}>
-                  <Button type="button" variant="primary" size="sm" icon={<Sparkles size={14} />}>
-                    Fix Issues & Resubmit
-                  </Button>
-                </Link>
-              )}
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleRunAIPreVerification}
-                loading={isAnalyzingAI}
-                loadingText="Re-verifying..."
-                icon={<BrainCircuit size={14} />}
-              >
-                Re-run AI Verification
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={() => {
-                  setSelectedRunReport(aiReport);
-                  setShowAIReportModal(true);
-                }}
-                icon={<Eye size={14} />}
-              >
-                Inspect Full AI Report
-              </Button>
-            </div>
-          </div>
-        </div>
-      ) : statusConfig.stageIndex <= 1 && normStatus !== 'draft' ? (
-        /* STATE 1: AI Pending Card ONLY when in Submitted / AI Pending stage */
-        <div className="detail-ai-card pending" style={{ marginBottom: '1.5rem', padding: '1.25rem', borderRadius: '12px', border: '1px solid #cbd5e1', background: '#f8fafc', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <div className="daic-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <div className="daic-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <BrainCircuit size={20} style={{ color: '#1a73e8' }} />
-              <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>AI Pre-Verification Pending</h4>
-            </div>
-            <span style={{ fontSize: '0.8rem', fontWeight: 600, padding: '0.25rem 0.65rem', borderRadius: '999px', background: '#e0f2fe', color: '#0369a1' }}>
-              Status: Waiting for AI Analysis
-            </span>
-          </div>
-
-          <p style={{ margin: 0, fontSize: '0.875rem', color: '#334155' }}>
-            Your project has been submitted to MongoDB and is queued for automated authenticity and biophysical pre-verification screening.
-          </p>
-
-          <div style={{ fontSize: '0.825rem', color: '#64748b', background: '#ffffff', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-            <strong style={{ color: '#334155' }}>The Automated Pre-Verification Engine will evaluate:</strong>
-            <span>&bull; Project authenticity & cross-project geographic buffer overlap</span>
-            <span>&bull; Latitudinal biophysical bounds & land authorization documents</span>
-            <span>&bull; Cryptographic SHA-256 evidence integrity & cross-project file reuse</span>
-            <span>&bull; Sentinel-2 MSI spectral formulas (NDVI / EVI)</span>
-            <span>&bull; Biophysical growth ceilings & silvicultural planting density</span>
-            <span>&bull; Allometric biomass modeling & carbon stock accounting</span>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.25rem' }}>
-            <Button
-              type="button"
-              variant="primary"
-              size="sm"
-              onClick={handleRunAIPreVerification}
-              loading={isAnalyzingAI}
-              loadingText="Running Pre-Verification..."
-              icon={<BrainCircuit size={14} />}
-            >
-              Start AI Pre-Verification
-            </Button>
-          </div>
-        </div>
-      ) : null}
 
       <div className="detail-header">
         <div>
@@ -386,7 +236,7 @@ const ProjectDetail = () => {
         </div>
         <div className="detail-badges-group">
           <span className={`detail-status-badge ${normStatus}`}>
-            {project.status || "Pending"}
+            {journey.label}
           </span>
           <span className={`mrv-lifecycle-pill ${mrvStatus.color}`}>
             <Activity size={12} /> MRV: {mrvStatus.label}
@@ -394,7 +244,34 @@ const ProjectDetail = () => {
         </div>
       </div>
       <p className="detail-organization">Submitted by: {project.ngoId || project.ngoName || 'NGO Partner'}</p>
-
+      <ProjectLifecycle project={project} compact />
+      <section className="journey-next" aria-label="Next action">
+        <h2>{journey.step === 3 ? 'Project complete' : 'What happens next'}</h2>
+        <p>{journey.next}</p><p><strong>Who acts:</strong> {journey.owner}</p>
+        <div className="journey-tools">
+          {journey.action === 'check' && (isValidator || isProjectOwner) && <button className="journey-primary" onClick={handleRunAIPreVerification} disabled={isAnalyzingAI}>{isAnalyzingAI ? 'Running checks…' : 'Run project checks'}</button>}
+          {journey.action === 'approve' && isValidator && <>
+            <button className="journey-primary" onClick={handleMintTokens} disabled={isMinting || isVoting}>{isMinting ? 'Submitting…' : 'Approve & issue tokens'}</button>
+            {!['approved', 'dao_approved'].includes(normStatus) && <button onClick={() => handleVote('disapprove')} disabled={isMinting || isVoting}>Request changes</button>}
+          </>}
+          {journey.action === 'edit' && isProjectOwner && <Link className="journey-primary" to={'/ngo/submit?projectId=' + projectId}>Update project</Link>}
+          {journey.action === 'receipt' && <button onClick={refreshReceipt} disabled={isMinting}>Check transaction</button>}
+          {journey.action === 'result' && <Link className="journey-primary" to="/token-registry">View issued tokens</Link>}
+        </div>
+        {journey.action === 'approve' && !isValidator && <p>A validator must sign in to complete this step. You can follow progress here.</p>}
+        {(needsLogin || (journey.action === 'approve' && !isValidator)) && <button className="journey-primary" onClick={() => { setNeedsLogin(false); setShowRoleSelector(true); }}>Sign in as validator</button>}
+        {isAnalyzingAI && <p role="status">{analyzingStepText || 'Checking project details and evidence…'}</p>}
+        {error && <p role="alert">{error}</p>}
+        {txMessage && <p role="status">{txMessage}</p>}
+      </section>
+      {(project.blockchainTx || journey.step >= 2) && <ProjectMintStatus project={project} config={blockchainConfig} canApprove={false}
+        showActions={false} onRefresh={refreshReceipt} busy={isMinting} />}
+      <details className="journey-details" open={journey.step === 1}>
+        <summary>Checks & supporting evidence</summary>
+        {aiReport ? <div><p><strong>Automated check: {aiReport.recommendationLabel || aiReport.recommendation}</strong></p>
+          <Button onClick={() => { setSelectedRunReport(aiReport); setShowAIReportModal(true); }}>View check report</Button>
+          {journey.action === 'edit' && isValidator && <Button onClick={handleRunAIPreVerification} loading={isAnalyzingAI}>Recheck evidence</Button>}
+        </div> : <p>{journey.action === 'edit' ? 'No automated report is available for this record. Review the evidence and activity history for requested changes.' : 'No automated report yet. Run the project checks before validator review.'}</p>}
       <div className="detail-grid">
         <div className="detail-card"><h4>Location</h4><p><MapPin size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} /> {project.location}</p></div>
         <div className="detail-card"><h4>Plantation Type</h4><p><Sprout size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} /> {project.plantationType}</p></div>
@@ -408,17 +285,18 @@ const ProjectDetail = () => {
       </div>
 
       {/* Project Location & Sentinel-2 ML Satellite Audit (Step 4) */}
-      <div className="detail-location-zone">
-        <SatelliteMLAudit
-          latitude={project.latitude || (projectGeo && projectGeo.latitude) || 21.8450}
-          longitude={project.longitude || (projectGeo && projectGeo.longitude) || 88.9210}
-          claimedAreaHectares={project.areaHectares || project.baselineData?.projectArea || 250}
+      <details className="journey-details" onToggle={e => setShowSatellite(e.currentTarget.open)}><summary>Satellite analysis (optional detail)</summary><div className="detail-location-zone">
+        {showSatellite && (Number.isFinite(project.latitude ?? projectGeo?.latitude) && Number.isFinite(project.longitude ?? projectGeo?.longitude) && (project.areaHectares || project.baselineData?.projectArea) > 0 ? <SatelliteMLAudit
+          latitude={project.latitude ?? projectGeo?.latitude}
+          longitude={project.longitude ?? projectGeo?.longitude}
+          claimedAreaHectares={project.areaHectares || project.baselineData?.projectArea}
           initialRadius={project.analysisRadius ? (project.analysisRadius > 50 ? project.analysisRadius / 1000 : project.analysisRadius) : 5.0}
           projectName={project.projectName}
           plantationType={project.plantationType}
-        />
+        /> : <p>Add valid project coordinates and area before running satellite analysis.</p>)}
       </div>
 
+      </details>
       {/* Project Evidence Gallery & Supporting Documents */}
       <div className="detail-evidence-section">
         <div className="des-header">
@@ -486,8 +364,9 @@ const ProjectDetail = () => {
         )}
       </div>
 
+      </details>
       {/* Environmental Baseline & MRV Monitoring Section (Phase 8) */}
-      <div className="detail-mrv-section">
+      <details className="journey-details"><summary>Environmental measurements & monitoring</summary><div className="detail-mrv-section">
         <MRVSummary
           baseline={baselineData}
           mrvRecords={mrvRecords}
@@ -497,11 +376,13 @@ const ProjectDetail = () => {
         />
       </div>
 
+      </details>
       {/* Project Verification Activity Timeline & Audit Log (Phase 9) */}
-      <div className="detail-activity-section">
+      <details className="journey-details"><summary>Activity history</summary><div className="detail-activity-section">
         <ProjectActivityTimeline projectId={projectId} project={project} />
       </div>
 
+      </details>
       {/* Lightbox Modal for Evidence Photos */}
       {selectedEvidenceImg && (
         <div className="detail-lightbox-overlay" onClick={() => setSelectedEvidenceImg(null)}>
@@ -533,7 +414,7 @@ const ProjectDetail = () => {
         <div className="public-visitor-banner">
           <div className="pvb-content">
             <strong><Globe size={15} style={{ verticalAlign: 'middle', marginRight: 5 }} /> Viewing Public Project Record</strong>
-            <p>Connect your MetaMask wallet as an authorized NGO, Validator, or Investor to participate in stewardship, verification voting, and token transactions.</p>
+            <p>You can follow this project without signing in. Connect your own wallet and choose a role to submit or review projects; no owner wallet is required.</p>
           </div>
           <Link to="/explore" className="bc-btn bc-btn--outline bc-btn--sm">
             ← Return to Explorer
@@ -541,72 +422,13 @@ const ProjectDetail = () => {
         </div>
       )}
 
-      {/* Validator / DAO Member: Vote Section (Step 4) */}
-      {userAddress && (isValidator || isAdmin) && (
-        <div className="voting-section">
-          <h3>Step 4: Sentinel-2 ML Audit & DAO Consensus Vote</h3>
-          {availableActions.canValidatorReview ? (
-            <>
-              <p className="vote-prompt">
-                Audit the Sentinel-2 ML satellite ground-truth, detected canopy hectares, and ground evidence documents above, then cast your consensus vote:
-              </p>
-              <div className="vote-actions">
-                <button onClick={() => handleVote('approve')} className="approve-btn" disabled={isVoting}>
-                  {isVoting ? 'Processing...' : (
-                    <>
-                      <CheckCircle2 size={16} style={{ marginRight: 6 }} /> Approve Project (Passes ML & Evidence Criteria)
-                    </>
-                  )}
-                </button>
-                <button onClick={() => handleVote('disapprove')} className="disapprove-btn" disabled={isVoting}>
-                  {isVoting ? 'Processing...' : (
-                    <>
-                      <XCircle size={16} style={{ marginRight: 6 }} /> Request Revision / Disapprove
-                    </>
-                  )}
-                </button>
-              </div>
-            </>
-          ) : (
-            <p className="vote-message">
-              Validator Consensus Status: <strong>{statusConfig.label}</strong> &mdash; {statusConfig.description}
-            </p>
-          )}
-          {error && <p className="vote-error">{error}</p>}
-        </div>
-      )}
-
-      {/* Admin: Mint Section */}
-      {isAdmin && (
-        <div className="admin-section">
-          <h3>Admin Actions</h3>
-          <AdminWalletInfo />
-
-          {availableActions.canMintCredits ? (
-            <div>
-              <p>This project has received full DAO approval. Mint BCT tokens to the NGO's wallet:</p>
-              <p className="mint-info">
-                Recipient: <code>{project.walletAddress}</code><br />
-                Amount: <strong>{(project.saplingsPlanted || 0).toLocaleString()} BCT</strong>
-              </p>
-              <button className="mint-btn" onClick={handleMintTokens} disabled={isMinting}>
-                {isMinting ? 'Minting on-chain...' : 'Mint & Send Tokens to NGO'}
-              </button>
-            </div>
-          ) : (
-            <p>Current Status: <strong>{statusConfig.label}</strong>. Project must achieve full approval before tokens can be minted.</p>
-          )}
-          {txMessage && <p className="vote-message blockchain">{txMessage}</p>}
-        </div>
-      )}
-
       {/* NGO Owner: List for Sale */}
-      {isNGO && isProjectOwner && isApproved && (
+      {isNGO && isProjectOwner && project.blockchainState === 'confirmed' && (
         <div className="ngo-action-section">
-          <h3>List Tokens for Sale</h3>
-          <p>Your project has been approved! You can now list your BCT tokens on the marketplace.</p>
-          <Link to="/ngo/projects" className="list-tokens-link">
-            Go to My Projects to List →
+          <h3>Optional: try the marketplace demo</h3>
+          <p>Your project is complete. Listing and purchases are separate demo features.</p>
+          <Link to="/demo/project-listings" className="list-tokens-link">
+            Open listing demo →
           </Link>
         </div>
       )}

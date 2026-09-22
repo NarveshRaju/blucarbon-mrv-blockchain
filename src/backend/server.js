@@ -207,13 +207,19 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const multer = require("multer");
 const { BlobServiceClient } = require("@azure/storage-blob");
-require("dotenv").config();
-const { triggerMinting } = require("./blockchain"); // import the function
+require("dotenv").config({ path: require("node:path").join(__dirname, ".env") });
+const blockchainRoutes = require("./blockchainRoutes");
+const { issueSession, requireValidator } = require('./validatorSessions');
 const { v4: uuidv4 } = require("uuid");
 const { verifyProjectData } = require("./services/aiVerificationService");
 
 const app = express();
-app.use(cors());
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:3000').split(',').map(url => url.trim());
+app.use(cors({ origin: allowedOrigins }));
+app.get('/health', (req, res) => {
+  const ready = mongoose.connection.readyState === 1;
+  res.status(ready ? 200 : 503).json({ status: ready ? 'ok' : 'database_unavailable' });
+});
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
@@ -222,9 +228,13 @@ async function initMongoDB() {
   const uri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/forms_db";
   try {
     await mongoose.connect(uri, { serverSelectionTimeoutMS: 3000 });
-    console.log("✅ MongoDB Connected to:", uri);
+    console.log("✅ MongoDB connected");
   } catch (err) {
-    console.warn("⚠️ Standard MongoDB connection failed:", err.message);
+    if (process.env.NODE_ENV === 'production') {
+      console.error('MongoDB connection failed. Check MONGO_URI and database network access.');
+      process.exit(1);
+    }
+    console.warn("⚠️ Standard MongoDB connection failed");
     console.log("🔄 Starting embedded In-Memory MongoDB Server for local execution...");
     try {
       const { MongoMemoryServer } = require("mongodb-memory-server");
@@ -324,6 +334,10 @@ const formSchema = new mongoose.Schema({
   location: String,
   plantationType: String,
   saplingsPlanted: Number,
+  blockchainTx: String,
+  blockchainState: String,
+  blockchainBlock: Number,
+  mintedTokens: Number,
   walletAddress: { type: String, index: true },
   price: Number,                // optional, for marketplace
   evidence: [evidenceItemSchema], // Dedicated Structured Evidence Array
@@ -450,6 +464,8 @@ const corporateAccountSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema, "users_db");
 const Admin = mongoose.model("Admin", userSchema, "admin_db");
 const Form = mongoose.model("Form", formSchema, "forms_db");
+const blockchainRouter = blockchainRoutes(Form);
+app.use('/blockchain', blockchainRouter);
 const Company = mongoose.model("Company", companySchema, "companies_db");
 const DAO = mongoose.model("DAO", daoSchema, "daos_db");
 const ProjectRegistration = mongoose.model("ProjectRegistration", projectRegistrationSchema, "project_registrations_db");
@@ -1195,6 +1211,9 @@ app.put("/forms/:id", async (req, res) => {
       return res.status(404).json({ error: "Project not found" });
     }
 
+    if (['preparing', 'pending', 'confirmed'].includes(project.blockchainState)) {
+      return res.status(409).json({ error: 'A project with pending or issued tokens cannot be resubmitted.' });
+    }
     if (req.body.projectName) project.projectName = req.body.projectName.trim();
     if (req.body.description) project.description = req.body.description.trim();
     if (req.body.location) project.location = req.body.location;
@@ -1277,6 +1296,9 @@ app.get("/forms", async (req, res) => {
         mrvRecords: form.mrvRecords || [],
         aiVerification: form.aiVerification || { status: "ai_pending" },
         status: form.status,
+        blockchainState: form.blockchainState,
+        blockchainTx: form.blockchainTx,
+        mintedTokens: form.mintedTokens,
         createdAt: form.createdAt,
         updatedAt: form.updatedAt,
         soldStatus: isSold ? "Sold" : "Not Sold",
@@ -1340,7 +1362,9 @@ app.get("/projects-for-sale", async (req, res) => {
       plantationType: project.plantationType,
       saplingsPlanted: project.saplingsPlanted,
       noOfPlantations: project.saplingsPlanted,
-      totalTokens: project.saplingsPlanted || 0,
+      totalTokens: project.blockchainState === 'confirmed' ? (project.mintedTokens || 0) : 0,
+      blockchainTx: project.blockchainTx,
+      blockchainState: project.blockchainState,
       costPerToken: project.price || 0,
       totalCost: project.totalCost || (project.saplingsPlanted * (project.price || 0)),
       walletAddress: project.walletAddress,
@@ -1432,9 +1456,11 @@ app.get("/projects-for-sale", async (req, res) => {
 // });
 
 // ---------------- Update Form Status (DAO / Validator / Lifecycle) ----------------
-app.patch("/forms/:id/status", async (req, res) => {
+app.patch("/forms/:id/status", requireValidator, async (req, res) => {
   try {
     const { status } = req.body;
+    if (['approved', 'Approved', 'dao_approved'].includes(status)) return blockchainRouter.approveAndMint(req, res);
+    if (status === 'credit_issued') return res.status(400).json({ error: 'Credits are issued only after a confirmed Sepolia transaction.' });
 
     const ALLOWED_STATUSES = [
       "draft", "submitted", "ai_pending", "ai_in_progress", "ai_passed", "ai_requires_changes",
@@ -1447,8 +1473,8 @@ app.patch("/forms/:id/status", async (req, res) => {
       return res.status(400).json({ error: `Invalid status value: ${status}` });
     }
 
-    const updatedForm = await Form.findByIdAndUpdate(
-      req.params.id,
+    const updatedForm = await Form.findOneAndUpdate(
+      { _id: req.params.id, blockchainState: { $nin: ['preparing', 'pending', 'confirmed'] } },
       { status, updatedAt: new Date() },
       { new: true }
     );
@@ -1719,7 +1745,7 @@ app.post("/dao/login", async (req, res) => {
 
     const cleanId = validatorId.trim();
     const validator = await DAOValidator.findOne({ 
-      validatorId: { $regex: new RegExp(`^${cleanId}$`, "i") } 
+      validatorId: { $regex: new RegExp(`^${cleanId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, "i") }
     });
 
     if (!validator) {
@@ -1740,6 +1766,7 @@ app.post("/dao/login", async (req, res) => {
     return res.json({
       success: true,
       message: "DAO Validator authentication successful.",
+      sessionToken: issueSession(validator.validatorId),
       validator: {
         validatorId: validator.validatorId,
         name: validator.name,

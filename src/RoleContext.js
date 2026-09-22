@@ -21,8 +21,8 @@ const ROLE_LABELS = {
 
 const ROLE_DESCRIPTIONS = {
   [ROLES.NGO]: 'Submit blue carbon projects, upload MRV data, and receive BCT tokens for verified carbon sequestration.',
-  [ROLES.VALIDATOR]: 'Review and verify project submissions, vote on proposals, and stake tokens to back verifications.',
-  [ROLES.COMPANY]: 'Purchase verified blue carbon credits, fulfill corporate sustainability requirements, and retire credits.',
+  [ROLES.VALIDATOR]: 'Review project checks and evidence, request changes, or approve and issue demo tokens.',
+  [ROLES.COMPANY]: 'Explore projects, view issued demo tokens, and try the marketplace simulation.',
   [ROLES.ADMIN]: 'Execute governance decisions, manage DAO parameters, and oversee platform operations.',
 };
 
